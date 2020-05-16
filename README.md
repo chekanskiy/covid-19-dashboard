@@ -1,5 +1,5 @@
-# dashboard-covid-19
-Dashboard exploring COVID-19 in Germany and the World
+# Fully Dynamic Dashboard
+exploring COVID-19 in Germany and the World
 
 * app.py contains app layout and callbacks
 * chart...py files contain plotly charts 
