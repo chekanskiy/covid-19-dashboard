@@ -1,9 +1,9 @@
 # Fully Dynamic Dashboard
 exploring COVID-19 in Germany and the World
 
-![Main view](dashboard.png)
+![Main view](images/dashboard.png)
 
-![Boxplot view](dashboard2.png)
+![Boxplot view](images/dashboard2.png)
 
 
 * app.py contains app layout and callbacks
