@@ -21,9 +21,9 @@ from chart_boxplot_static1 import plot_box_plotly_static
 from chart_line_static1 import plot_lines_plotly
 
 # ============================================ LOAD DATA =====================================================
-df_rki_orig = pd.read_csv('dash/data/data_rki_apple_prepared_dash.csv')
+df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
 df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
-geojson = json.load(open('dash/data/data_geo_de.json', 'r'))
+geojson = json.load(open('data/data_geo_de.json', 'r'))
 # ========================================= END LOAD DATA ====================================================
 
 # ========================================= CREATE APP =======================================================
