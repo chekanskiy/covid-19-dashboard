@@ -1,7 +1,8 @@
 # Fully Dynamic Dashboard
 exploring COVID-19 in Germany and the World
 
-![](dashboard.png)
+![](dashboard.png 800x600)
+
 ![](dashboard2.png)
 
 
