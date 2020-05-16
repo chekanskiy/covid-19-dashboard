@@ -2,6 +2,8 @@
 exploring COVID-19 in Germany and the World
 
 ![](dashboard.png)
+![](dashboard2.png)
+
 
 * app.py contains app layout and callbacks
 * chart...py files contain plotly charts 
