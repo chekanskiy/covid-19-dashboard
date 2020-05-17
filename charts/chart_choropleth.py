@@ -77,7 +77,7 @@ def plot_map_go(df, geojson, column, _colors=colors.diverging.Temps * 3):
 
         ),
             dict(
-                x=0,
+                x=0.05,
                 y=0.96,
                 xref='paper',
                 yref='paper',
