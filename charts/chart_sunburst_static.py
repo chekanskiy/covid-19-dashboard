@@ -40,7 +40,7 @@ def plot_sunburst_static(df, value_column,
                          value_column_name=''):
     color = '#1f2630'
 
-    hovertemplate = '<b>%{label} </b> <br> ' + value_column_name + ': %{value}<br>per 100k: %{color:.0f}'
+    hovertemplate = '<b>%{label} </b> <br> ' + value_column_name + ': %{value}<br>     per 100k: %{color:.0f}'
 
     df_sunburst = build_hierarchical_dataframe(df, levels, value_column, color_columns)
 
