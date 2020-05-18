@@ -16,6 +16,7 @@ from charts.chart_choropleth import plot_map_go
 from charts.chart_boxplot_static import plot_box_plotly_static
 from charts.chart_line_static import plot_lines_plotly
 from charts.chart_sunburst_static import plot_sunburst_static
+from charts.chart_bar_static import plot_bar_static
 
 # ============================================ LOAD DATA =====================================================
 df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
@@ -433,11 +434,8 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
 
 
 def select_value_for_boxplot(selected_column):
-    if selected_column in ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
-                           'driving', 'walking', 'transit'):
+    if selected_column in ('driving', 'walking', 'transit'):
         selected_column = 'confirmed_change'
-    if selected_column in ('dead_change_pct_3w', 'dead_doubling_days_3w_avg3'):
-        selected_column = 'dead_change'
     return selected_column
 
 
@@ -459,12 +457,22 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
     :return:
     """
     selected_column = select_value_for_boxplot(selected_column)
+
     if len(selected_states) > 0:
         df_jh_world.index = df_jh_world.date
         df = df_jh_world.loc[df_jh_world.index == df_jh_world.index.max()]
-        figure = plot_sunburst_static(df, selected_column,
-                                      color_columns=[selected_column, 'population_100k'],
-                                      value_column_name=FEATURE_DROP_DOWN[selected_column])
+        if '100k' in selected_column or selected_column in \
+                ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
+                 'dead_change_pct_3w', 'dead_doubling_days_3w_avg3'):
+            if 'doubling_days' in selected_column:
+                df = df.loc[df[selected_column] > 0].sort_values(selected_column, ascending=True).head(25)
+            else:
+                df = df.sort_values(selected_column, ascending=False).head(25)
+            figure = plot_bar_static(df, selected_column)
+        else:
+            figure = plot_sunburst_static(df, selected_column,
+                                          color_columns=[selected_column, 'population_100k'],
+                                          value_column_name=FEATURE_DROP_DOWN[selected_column])
     else:
         figure = BASE_FIGURE
     return figure
