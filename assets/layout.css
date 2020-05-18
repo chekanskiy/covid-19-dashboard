@@ -3,7 +3,7 @@
 
 #dropdown-container {
     background-color: #252e3f;
-    padding: 2rem 6rem 4rem 3rem;
+    padding: 2rem 2rem 2rem 2rem;
     height: 8rem;
 }
 
@@ -22,22 +22,32 @@
 
 */
 
+/* Averaging Buttons
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.div-button-weekly-average {
+    display: inline-block;
+    margin: 0 0 0 0;
+    background-color: #252e3f;
+    padding: 0rem 2rem 0rem 0rem;
+}
+
 /* Heatmap
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 #left-chart-container {
-    margin: 2.5rem 0 0 0;
+    margin: 0 0 0 0;
     background-color: #252e3f;
+    padding: 0 2rem 2rem 2rem;
 }
 
 #left-chart-title {
     margin: 0;
-    padding: 1rem;
+    padding: 0rem;
 }
 
 #heatmap-subtitle {
     margin: 0;
-    padding: 1rem;
+    padding: 0rem;
 }
 
 #left-chart {
@@ -82,40 +92,32 @@
         flex-direction: column;
         justify-content: flex-start;
         align-content: center;
-        flex: 6 60%;
+        flex: 6 80%;
     }
 
 /* Right column
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-
 #right-column {
     background-color: #252e3f;
-    padding: 2rem 4rem 4rem 4rem;
-    margin: 0;
+    padding: 2rem 2rem 0rem 2rem;
+    height: 139rem;
 }
 
-@media (max-width: 1250px) {
-    /*For mobile and smaller screens*/
-    #header h4 {
-        text-align: center;
+#right-chart {
+        padding: 0 0 2rem 0
     }
 
-    #right-column {
-        margin-top: 5rem;
-    }
-
-    #right-chart {
-        height: 55rem;
-    }
-
+#chart-dropdown {
+    padding: 0 0 2rem 0;
 }
+
+#right-chart-2-title {
+    padding: 4rem 0 0 0;
+}
+
 
 @media (min-width: 1251px) {
     /*For desktop*/
-    #logo {
-        float: right;
-        padding-right: 2rem;
-    }
 
     #header p {
         font-size: 1.5rem;
@@ -124,15 +126,14 @@
     #right-column {
         flex: 4 40%;
         margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
+        display: inline;
     }
 
     #right-chart {
-        flex-grow: 1;
+        flex-grow: 4;
+        height: 55rem;
     }
+
 }
 
 @media (max-width: 550px) {
@@ -148,12 +149,6 @@
         font-size: 1.7rem !important;
     }
 }
-
-
-#chart-dropdown {
-    margin-bottom: 6.6rem;
-}
-
 
 /* Dropdown
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

@@ -87,9 +87,9 @@ FEATURE_DROP_DOWN = {
 }
 
 TABS_STYLES = {
-    'height': '40px',
+    'height': '6rem',
     'borderBottom': '0px solid #7fafdf',
-    'paddingBottom': '20px',
+    'padding': '0 0 0 0',
 }
 
 TAB_STYLE = {
@@ -98,11 +98,11 @@ TAB_STYLE = {
     'borderRight': '0px solid #7fafdf',
     'borderBottom': '0px solid #7fafdf',
     'backgroundColor': '#252e3f',
-    'padding': '10px',
     'color': "while",
     'textAlign': 'center',
     'fontSize': '14px',
     'fontWeight': 'bold',
+    'padding': '2rem 0 0 0',
 }
 
 TAB_SELECTED_STYLE = {
@@ -112,10 +112,10 @@ TAB_SELECTED_STYLE = {
     'borderBottom': '0px solid #7fafdf',
     'backgroundColor': COLORS['background'],
     'color': 'white',
-    'padding': '10px',
-    'textAlign': 'top',
+    'textAlign': 'center',
     'fontSize': '14px',
     'fontWeight': 'bold',
+    'padding': '2rem 0 0 0',
 }
 
 # ========================================= DEFINE LAYOUT ================================================
@@ -161,8 +161,6 @@ app.layout = html.Div(
                                                 for state, iso in zip(STATES.values(), STATES.keys())],
                                                     ),
                                     style={'width': '100%', 'display': 'inline-block',
-                                           'margin-right': 0, 'margin-left': 0,
-                                           'virticalalign': 'middle'
                                            }
                                         ),
                                 # html.Div(dcc.DatePickerRange(
@@ -181,17 +179,15 @@ app.layout = html.Div(
                                 html.Div(children=[
                                     html.Div(
                                         id='div-button-weekly-top',
-                                        children=dbc.Button(children="7 Day Avg Off/On",
+                                        className='div-button-weekly-average',
+                                        children=dbc.Button(
+                                                            children="7 Day Avg Off/On",
                                                             id='button-weekly-top', size='sm', color="info"),
-                                        style={'display': 'inline-block',
-                                               'margin-right': 23, 'margin-left': 23,
-                                               }),
+                                        style={'display': 'inline-block'}),
                                     html.Div(html.P(
-                                        children="Daily Confirmed Cases per 100k of Population",
                                         id="left-chart-title",),
-                                        style={'display': 'inline-block',
-                                               'margin-right': 0, 'margin-left': 0,
-                                               }),
+                                        style={'display': 'inline-block',}
+                                            ),
                                                 ],
                                         ),
                                 dcc.Graph(
@@ -201,11 +197,10 @@ app.layout = html.Div(
                                 html.Div(children=[
                                     html.Div(
                                         id='div-button-weekly-mobility',
+                                        className='div-button-weekly-average',
                                         children=dbc.Button(children="7 Day Avg Off/On",
                                                             id='button-weekly-mobility', size='sm', color="info"),
-                                        style={'display': 'inline-block',
-                                               'margin-right': 23, 'margin-left': 23,
-                                               }),
+                                        style={'display': 'inline-block'}),
                                     html.Div(html.P(
                                         children="Driving traffic relative to January 2020",
                                         id="left-chart-2-title", ),
@@ -230,54 +225,50 @@ app.layout = html.Div(
                 html.Div(
                     id="right-column",
                     children=[
-                        html.P(id="chart-selector", children="Select the value to plot:"),
-                        dcc.Dropdown(
-                            options=[{'label': l, 'value': v} for l, v in
-                                     zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                            value="confirmed_change",
-                            id="chart-dropdown",
-                        ),
-                        dcc.Tabs(id='tabs-example',
-                                 parent_className='custom-tabs',
-                                 className='custom-tabs-container',
-                                 value='tab-map',
-                                 children=[
-                                    dcc.Tab(label='Map Tab', value='tab-map',
-                                            # className='custom-tab',
-                                            # selected_className='custom-tab--selected'
-                                            style=TAB_STYLE,
-                                            selected_style=TAB_SELECTED_STYLE
-                                            ),
-                                    dcc.Tab(label='Boxplot Tab', value='tab-boxplot',
-                                            # className='custom-tab',
-                                            # selected_className='custom-tab--selecte
-                                            style=TAB_STYLE,
-                                            selected_style=TAB_SELECTED_STYLE
-                                            ),
-                                            ], style=TABS_STYLES),
                         html.Div(
+                            id='dropdown-and-tab-container',
+                            children=[
+                                html.P(id="chart-selector", children="Select the value to plot:"),
+                                dcc.Dropdown(
+                                    options=[{'label': l, 'value': v} for l, v in
+                                             zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
+                                    value="confirmed_change",
+                                    id="chart-dropdown",
+                                ),
+                                dcc.Tabs(id='tabs-example',
+                                         parent_className='custom-tabs',
+                                         className='custom-tabs-container',
+                                         value='tab-map',
+                                         children=[
+                                            dcc.Tab(label='Map Tab', value='tab-map',
+                                                    style=TAB_STYLE,
+                                                    selected_style=TAB_SELECTED_STYLE
+                                                    ),
+                                            dcc.Tab(label='Boxplot Tab', value='tab-boxplot',
+                                                    style=TAB_STYLE,
+                                                    selected_style=TAB_SELECTED_STYLE
+                                                    ),
+                                                    ], style=TABS_STYLES),
+                                ]),
+                        html.Div(
+                            id='right-chart-container',
                             children=[
                                 html.Div(children=[
                                     dcc.Graph(
                                         id="right-chart",
                                         figure=BASE_FIGURE,
                                             ),],
-                                        style={'display': 'inline-block', 'width': '100%', 'height': '50%',
-                                               'padding-bottom':'1rem'
-                                               }),
-                                    ]
                                 ),
-                        html.Div(children=[
-                                    html.P(
-                                        children="Drill-down chart",
-                                        id="right-chart-2-title", ),
-                                    html.Div(children=[dcc.Graph(
-                                        id="right-chart-2",
-                                        figure=BASE_FIGURE,),])
-
-                                ],
-                                    # style={'display': 'inline-block', 'width': '100%', 'height': '40%'}
-                                         )
+                                html.Div(html.P(
+                                    children=' ',
+                                    id="right-chart-2-title", ),
+                                    style={'display': 'inline-block', }
+                                ),
+                                html.Div(children=[dcc.Graph(
+                                    id="right-chart-2",
+                                    figure=BASE_FIGURE, )],
+                                        )
+                        ]),
                             ],
                         )
                 ]
@@ -441,14 +432,22 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         return update_right_chart_map(selected_column, selected_date)
 
 
+def select_value_for_boxplot(selected_column):
+    if selected_column in ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
+                           'driving', 'walking', 'transit'):
+        selected_column = 'confirmed_change'
+    if selected_column in ('dead_change_pct_3w', 'dead_doubling_days_3w_avg3'):
+        selected_column = 'dead_change'
+    return selected_column
+
+
 @app.callback(
     Output('right-chart-2', 'figure'),
     [Input('chart-dropdown', 'value'),
      Input('dropdown-states', 'value'),
-     Input('tabs-example', 'value'),
      Input('left-chart', 'selectedData')],
 )
-def update_right_chart_2(selected_column, selected_states, selected_tab, selected_data):
+def update_right_chart_2(selected_column, selected_states, selected_data):
     """
     Displays / Updates the chart on the right based on input.
     Changing any value redraws the chart.
@@ -459,16 +458,33 @@ def update_right_chart_2(selected_column, selected_states, selected_tab, selecte
     :param selected_data:
     :return:
     """
+    selected_column = select_value_for_boxplot(selected_column)
     if len(selected_states) > 0:
         df_jh_world.index = df_jh_world.date
         df = df_jh_world.loc[df_jh_world.index == df_jh_world.index.max()]
-        df.loc[df[selected_column] < 0, selected_column] = 0
         figure = plot_sunburst_static(df, selected_column,
                                       color_columns=[selected_column, 'population_100k'],
                                       value_column_name=FEATURE_DROP_DOWN[selected_column])
     else:
         figure = BASE_FIGURE
     return figure
+
+
+@app.callback(
+    Output('right-chart-2-title', 'children'),
+    [Input('chart-dropdown', 'value'),
+    ])
+def update_right_chart_2_title(selected_column):
+    """
+    Updates the Title of the left chart based on  the value selected in the right drop-down menu and
+    the state of the button selecting averaging
+    :param selected_column:
+    :param n_clicks:
+    :return: string: Title to display
+    """
+    selected_column = select_value_for_boxplot(selected_column)
+
+    return "Global " + FEATURE_DROP_DOWN[selected_column]
 
 
 @app.callback(
@@ -494,7 +510,7 @@ def update_left_chart_title(selected_column, n_clicks):
 #     Output('left-chart-title', 'children'),
 #     [Input('left-chart', 'selectedData')
 #     ])
-# def update_left_chart_title(data):
+# def test_update_left_chart_title(data):
 #     """
 #     Test Callback to print values returned by selectedData object.
 #     Keep it commented out if not debugging.

@@ -321,6 +321,11 @@ p {
     font-size: 2rem;
 }
 
+#right-chart-2-title {
+    font-family: "Playfair Display", sans-serif;
+    font-size: 2rem;
+}
+
 #left-chart-subtitle {
     font-size: 1.5rem;
 }
