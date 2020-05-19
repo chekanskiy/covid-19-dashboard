@@ -19,7 +19,7 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
             r = start_value * 2 ** (day / days_doubling)
             return r
 
-        start_value = df.loc[df[column] > 0, column].min()
+        start_value = df.loc[(df[column] > 0) & (df.index == df.index.min()), column].median()
         if start_value < 1:
             start_value = 1
 
