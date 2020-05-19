@@ -23,18 +23,18 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
         if start_value < 1:
             start_value = 1
 
+        # prepare empty dataframe to fill in
         date_range = pd.date_range(df.index.min(), df.index.max())
         df_index = pd.DataFrame(columns=['date', 'land', column],
                                 data={'date': date_range, 'land': _doubling_column},
                                 )
-
+        # create a column with rank 1,2,3 etc for every 'land' in this case doubling types
         df_index['rn'] = df_index.groupby('land')['date'].rank(method='first', ascending=True)
         df_index[column] = df_index['rn'].apply(lambda x: double_every_x_days(x, doubling_days, start_value))
         df_index['date'] = df_index['date'].astype('datetime64[ns]')
         df_index.set_index('date', inplace=True, drop=False)
         df_index.sort_index(inplace=True, ascending=True)
         del df_index['rn']
-        # del df_index['date']
         df = df.append(df_index, ignore_index=False, verify_integrity=False, sort=True)
         # df = df.rename_axis('dates_index').sort_values(by=['land', 'dates_index'], ascending=[True, True])
 
