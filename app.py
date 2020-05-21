@@ -89,6 +89,11 @@ FEATURE_DROP_DOWN = {
     "transit": "Transit traffic relative to January 2020",
 }
 
+# TODO: REMOVE TEMP SOLUTION TO DISPLAY ALL COLUMNS
+for col in df_rki_orig.columns:
+    if col not in FEATURE_DROP_DOWN.keys():
+        FEATURE_DROP_DOWN[col] = col
+
 TABS_STYLES = {
     'height': '6rem',
     'borderBottom': '0px solid #7fafdf',
@@ -290,15 +295,15 @@ def update_weekly_button(n_clicks):
     :return:
     """
     if n_clicks is None or n_clicks % 2 == 0:
-        return "7 DAY AVG IS ON"
-    else:
         return "7 DAY AVG IS OFF"
+    else:
+        return "7 DAY AVG IS ON"
 
 
 @app.callback(
     Output("button-weekly-mobility", "children"),
     [Input("button-weekly-mobility", "n_clicks")])
-def update_weekly_button(n_clicks):
+def update_weekly_button_2(n_clicks):
     """
     Changes the name displayed on the button button-weekly-left-chart-2
     based on how many times it was clicked (even / uneven number of times)
@@ -343,9 +348,9 @@ def update_left_chart(selected_column, selected_states, n_clicks):
     """
     if len(selected_states) > 0:  # In case all states are deselected
         if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-            df, selected_column = moving_average_7d(df_rki_orig, selected_column)
-        else:
             df = df_rki_orig
+        else:
+            df, selected_column = moving_average_7d(df_rki_orig, selected_column)
 
         figure = plot_lines_plotly(df, selected_states, selected_column,
                                    show_doubling=True, doubling_days=7, showlegend=False,
@@ -375,13 +380,14 @@ def update_left_chart_2(selected_states, n_clicks):
         selected_column = columns_mobility[0]
 
         if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-            df = df_rki_orig
+            figure = plot_lines_plotly(df_rki_orig, selected_states, selected_column,
+                                       show_doubling=False, doubling_days=7, showlegend=False,
+                                       _colors=COLORS['charts'])
         else:
             df, selected_column = moving_average_7d(df_rki_orig, selected_column)
-
-        figure = plot_lines_plotly(df, selected_states, selected_column,
-                                   show_doubling=False, doubling_days=7, showlegend=False,
-                                   _colors=COLORS['charts'])
+            figure = plot_lines_plotly(df, selected_states, selected_column,
+                                       show_doubling=False, doubling_days=7, showlegend=False,
+                                       _colors=COLORS['charts'])
     else:  # Default figure is displayed initially, on refresh and when no states are selected
         figure = BASE_FIGURE
     return figure
@@ -511,9 +517,9 @@ def update_left_chart_title(selected_column, n_clicks):
     :return: string: Title to display
     """
     if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-        return FEATURE_DROP_DOWN[selected_column] + ', 7 day moving average'
-    else:
         return FEATURE_DROP_DOWN[selected_column] + ', by day'
+    else:
+        return FEATURE_DROP_DOWN[selected_column] +  ', 7 day moving average'
 
 
 # @app.callback(
