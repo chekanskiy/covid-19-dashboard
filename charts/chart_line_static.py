@@ -8,7 +8,8 @@ from plotly import colors
 def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Temps * 3,
                       title=False, show_doubling=True, doubling_days=7, showlegend=False):
 
-    df = df_unfiltered.loc[df_unfiltered.land.isin(lands), ['land', column, 'date']].dropna()
+    df = df_unfiltered.loc[df_unfiltered.land.isin(lands), ['land', column, 'date',
+                                                            'confirmed_peak_date']] #.dropna().sort_values(by=['land', 'date'], ascending=[True, True])
     df.set_index('date', inplace=True, drop=False)
 
     del df_unfiltered
@@ -74,7 +75,6 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
                                                dash='dot', ),
                                      connectgaps=True,
                                      ))
-
         # Adding all other lines
         else:
             fig.add_trace(go.Scatter(x=df.loc[df.land == l].index,
@@ -105,6 +105,63 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
                 marker=dict(color=_colors[i], size=_mode_size[i] + 2, ),
                 showlegend=False,
             ))
+        if 'confirmed_peak_date' in df.columns:
+            # Mark when the peak is reached
+            peak_index = df.loc[(df.land == l) & (df['confirmed_peak_date'] == 1), column].index.tolist()
+            fig.add_trace(go.Scatter(
+                x=peak_index,
+                y=df.loc[(df.index.isin(peak_index)) & (df.land == l), column].tolist(),
+                # y=[df.loc[(df.index == peak_index) & (df.land == l), column]],
+                mode='markers',
+                name=f"Peak {l}",
+                marker=dict(
+                    color='#008000',
+                    size=15,
+                    opacity=1,
+                    symbol='triangle-down',
+                    line=dict(
+                        # color=_colors[i],
+                        width=1
+                    )),
+                showlegend=False,
+            ))
+            # Mark when the new peak is starting (new wave is approaching)
+            peak_index = df.loc[(df.land == l) & (df['confirmed_peak_date'] == -1), column].index.tolist()
+            fig.add_trace(go.Scatter(
+                x=peak_index,
+                y=df.loc[(df.index.isin(peak_index)) & (df.land == l), column].tolist(),
+                mode='markers',
+                name=f"New Wave {l}",
+                marker=dict(
+                    color='#FF0000',
+                    size=15,
+                    opacity=1,
+                    symbol='triangle-up',
+                    line=dict(
+                        # color=_colors[i],
+                        width=1
+                    )),
+                showlegend=False,
+            ))
+            # # Mark when we predict the perk to be reached
+            # peak_index = df.loc[(df.land == l) & (df['peak_log_trend'] < 0), column].index.tolist()
+            # fig.add_trace(go.Scatter(
+            #     x=peak_index,
+            #     # y=[df.loc[df['peak_log_trend'] < 0, column].max().round(2)],
+            #     y=df.loc[(df.index.isin(peak_index)) & (df.land == l), column].tolist(),
+            #     mode='lines+markers',
+            #     name=f"fc: {l}",
+            #     marker=dict(
+            #         color=_colors[i],
+            #         size=20,
+            #         opacity=1,
+            #         symbol='triangle-up',
+            #         line=dict(
+            #             color=_colors[i],
+            #             width=1
+            #         )),
+            #     showlegend=False,
+            # ))
 
     # BUTTONS Changing Y Scale
     updatemenus = list([
