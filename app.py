@@ -75,6 +75,7 @@ FEATURE_DROP_DOWN = {
     "confirmed_change": "Cases: Daily",
     "confirmed": "Cases: Total",
     "confirmed_active_cases": "Cases: Active",
+    "confirmed_active_cases_change": "Cases: Active Daily Change",
     "confirmed_per_100k": "Cases: Total per 100k of Population",
     "confirmed_change_per_100k": "Cases: Daily per 100k of Population",
     "confirmed_change_pct_3w": "Cases: Daily as % of Rolling 3 Week Sum",
@@ -136,13 +137,33 @@ app.layout = html.Div(
             children=[
                 # html.Img(id="logo", src=app.get_asset_url("dash-logo.png")),
                 html.H4(children='COVID-19 in Germany', #style={ 'textAlign': 'left', 'color': colors['text']}
-                        ),
-                html.P(
-                      id="description",
-                      children="Fully interactive dashboard",
-                  ),
-                    ]
+                        ),]
         ),
+        html.Div(children=[
+                html.P(
+                    id="description",
+                    children="Fully interactive dashboard",
+                                 ),],
+                style={
+                    'width': '10%',
+                    'display': 'inline-block',
+                }
+                ),
+        # html.Div(children=[
+        #         dcc.RadioItems(
+        #             options=[
+        #                 {'label': 'Germany', 'value': 'GER'},
+        #                 {'label': 'World', 'value': 'WRLD'}
+        #             ],
+        #             value='MTL',
+        #             labelStyle={'display': 'inline-block'}
+        #                         ),
+        # ],
+        #         style={
+        #                'width': '15%',
+        #                'display': 'inline-block',
+        #                }
+        #             ),
         html.Div(
             id="app-container",
             children=[
@@ -168,9 +189,11 @@ app.layout = html.Div(
                                                 }
                                                 for state, iso in zip(STATES.values(), STATES.keys())],
                                                     ),
-                                    style={'width': '100%', 'display': 'inline-block',
+                                    style={
+                                            'width': '100%',
+                                            'display': 'inline-block',
                                            }
-                                        ),
+                                )
                                 # html.Div(dcc.DatePickerRange(
                                 #     id='date-picker-range',
                                 #     start_date=dt(1997, 5, 3),
@@ -210,7 +233,6 @@ app.layout = html.Div(
                                                             id='button-weekly-mobility', size='sm', color="info"),
                                         style={'display': 'inline-block'}),
                                     html.Div(html.P(
-                                        children="Driving traffic relative to January 2020",
                                         id="left-chart-2-title", ),
                                         style={'display': 'inline-block',
                                                'margin-right': 0, 'margin-left': 0,
@@ -267,11 +289,22 @@ app.layout = html.Div(
                                         figure=BASE_FIGURE,
                                             ),],
                                 ),
-                                html.Div(html.P(
-                                    children=' ',
-                                    id="right-chart-2-title", ),
-                                    style={'display': 'inline-block', }
-                                ),
+                                html.Div(
+                                    id='dropdown-2-container',
+                                    children=[
+                                        html.P(id="chart-selector-2", children="Select the value to plot:"),
+                                        dcc.Dropdown(
+                                            id="chart-dropdown-2",
+                                            options=[{'label': l, 'value': v} for l, v in
+                                                     zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
+                                            value="confirmed_change",
+
+                                ),]),
+                                # html.Div(html.P(
+                                #     children=' ',
+                                #     id="right-chart-2-title", ),
+                                #     style={'display': 'inline-block', }
+                                # ),
                                 html.Div(children=[dcc.Graph(
                                     id="right-chart-2",
                                     figure=BASE_FIGURE, )],
@@ -363,9 +396,10 @@ def update_left_chart(selected_column, selected_states, n_clicks):
 @app.callback(
     Output('left-chart-2', 'figure'),
     [Input('dropdown-states', 'value'),
+     Input('chart-dropdown-2', 'value'),
      Input("button-weekly-mobility", "n_clicks")
     ])
-def update_left_chart_2(selected_states, n_clicks):
+def update_left_chart_2(selected_states, selected_column, n_clicks):
     """
     Displays / Updates the left chart.
     Number of clicks on the button-weekly-mobility object define how the data is filtered
@@ -376,8 +410,8 @@ def update_left_chart_2(selected_states, n_clicks):
     :return:
     """
     if len(selected_states) > 0:  # In case all states are deselected
-        columns_mobility = ['driving', 'walking', 'transit']
-        selected_column = columns_mobility[0]
+        # columns_mobility = ['driving', 'walking', 'transit']
+        # selected_column = columns_mobility[0]
 
         if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
             figure = plot_lines_plotly(df_rki_orig, selected_states, selected_column,
@@ -449,7 +483,7 @@ def select_value_for_boxplot(selected_column):
 
 @app.callback(
     Output('right-chart-2', 'figure'),
-    [Input('chart-dropdown', 'value'),
+    [Input('chart-dropdown-2', 'value'),
      Input('dropdown-states', 'value'),
      Input('left-chart', 'selectedData')],
 )
@@ -466,9 +500,17 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
     """
     selected_column = select_value_for_boxplot(selected_column)
 
+    df_jh_world.index = df_jh_world.date
+
     if len(selected_states) > 0:
-        df_jh_world.index = df_jh_world.date
-        df = df_jh_world.loc[df_jh_world.index == df_jh_world.index.max()]
+        if selected_data is None:
+            df = df_jh_world.loc[df_jh_world.index == df_jh_world.index.max()]
+        else:
+            selected_date = selected_data['points'][-1]['x']
+            if not isinstance(selected_date, (list, tuple)):
+                selected_date = [selected_date]
+            df = df_jh_world.loc[df_jh_world.index.isin(selected_date)]
+
         if '100k' in selected_column or selected_column in \
                 ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
                  'dead_change_pct_3w', 'dead_doubling_days_3w_avg3'):
@@ -486,10 +528,10 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
     return figure
 
 
-@app.callback(
-    Output('right-chart-2-title', 'children'),
-    [Input('chart-dropdown', 'value'),
-    ])
+# @app.callback(
+#     Output('right-chart-2-title', 'children'),
+#     [Input('chart-dropdown', 'value'),
+#     ])
 def update_right_chart_2_title(selected_column):
     """
     Updates the Title of the left chart based on  the value selected in the right drop-down menu and
@@ -519,7 +561,25 @@ def update_left_chart_title(selected_column, n_clicks):
     if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
         return FEATURE_DROP_DOWN[selected_column] + ', by day'
     else:
-        return FEATURE_DROP_DOWN[selected_column] +  ', 7 day moving average'
+        return FEATURE_DROP_DOWN[selected_column] + ', 7 day moving average'
+
+@app.callback(
+    Output('left-chart-2-title', 'children'),
+    [Input('chart-dropdown-2', 'value'),
+     Input("button-weekly-top", "n_clicks")
+    ])
+def update_left_chart_2_title(selected_column, n_clicks):
+    """
+    Updates the Title of the left chart based on  the value selected in the right drop-down menu and
+    the state of the button selecting averaging
+    :param selected_column:
+    :param n_clicks:
+    :return: string: Title to display
+    """
+    if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
+        return FEATURE_DROP_DOWN[selected_column] + ', by day'
+    else:
+        return FEATURE_DROP_DOWN[selected_column] + ', 7 day moving average'
 
 
 # @app.callback(

@@ -46,7 +46,10 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
 
     #     max_x_range = len(df.index)
     _max_y_range = df.loc[df.land != _doubling_column, column].max() * 1.1
-    _min_y_range = df.loc[(df.land != _doubling_column) & (df[column] > 0), column].min() / 2
+    if df.loc[:, column].min() > 0:
+        _min_y_range = df.loc[(df.land != _doubling_column) & (df[column] > 0), column].min() / 2
+    else:
+        _min_y_range = df.loc[(df.land != _doubling_column), column].min() * 1.1
 
     _symbols = [x for i, x in enumerate(SymbolValidator().values) if i % 2 != 0]  # all markers
     _gray_color = 'rgb(204, 204, 204)'
@@ -229,7 +232,7 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
             showline=False,
             showticklabels=True,
             tickfont=dict(color='#2cfec1'),
-            range=[0, _max_y_range],
+            range=[_min_y_range, _max_y_range],
         ),
         margin=dict(
             autoexpand=True,
