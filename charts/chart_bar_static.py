@@ -38,7 +38,7 @@ from plotly import colors
 #             yellow, yellowgreen
 
 
-def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=colors.diverging.Temps):
+def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=colors.diverging.Temps * 3):
     bg_color = '#1f2630'
     text_color = '#2cfec1'
     gray_color = 'rgb(204, 204, 204)'

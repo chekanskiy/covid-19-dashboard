@@ -435,7 +435,7 @@ def moving_average_7d(df, selected_column, selected_states):
     df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly'))
     selected_column += '_weekly'
     df.index = index
-    return df, selected_column
+    return df.dropna(), selected_column
 
 
 @app.callback(
