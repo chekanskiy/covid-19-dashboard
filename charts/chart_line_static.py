@@ -5,14 +5,9 @@ from plotly.validators.scatter.marker import SymbolValidator
 from plotly import colors
 
 
-def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Temps * 3,
+def plot_lines_plotly(df, column, _colors=colors.diverging.Temps * 3,
                       title=False, show_doubling=True, doubling_days=7, showlegend=False):
 
-    df = df_unfiltered.loc[df_unfiltered.land.isin(lands), ['land', column, 'date',
-                                                            'confirmed_peak_date']]
-    df.set_index('date', inplace=True, drop=False)
-
-    del df_unfiltered
     _doubling_column = f'double_x{doubling_days}'
 
     if show_doubling:

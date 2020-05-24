@@ -468,9 +468,15 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
                 selected_states = DEFAULT_VALUE_WORLD
 
     if len(selected_states) > 0:  # In case all states are deselected
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
+
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
-        figure = plot_lines_plotly(df, selected_states, selected_column,
+
+        df.set_index('date', inplace=True, drop=False)
+        df = df.dropna(how='all', subset=[selected_column])
+
+        figure = plot_lines_plotly(df, selected_column,
                                    show_doubling=True, doubling_days=7, showlegend=False,
                                    _colors=COLORS['charts'])
     else:  # Default figure is displayed initially, on refresh and when no states are selected
@@ -510,11 +516,15 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
                 selected_states = DEFAULT_VALUE_WORLD
 
     if len(selected_states) > 0:  # In case all states are deselected
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
 
-        figure = plot_lines_plotly(df, selected_states, selected_column,
+        df.set_index('date', inplace=True, drop=False)
+        df = df.dropna(how='all', subset=[selected_column])
+
+        figure = plot_lines_plotly(df, selected_column,
                                    show_doubling=False, doubling_days=7, showlegend=False,
                                    _colors=COLORS['charts'])
 
