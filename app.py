@@ -552,9 +552,11 @@ def update_right_chart_map(selected_column, selected_date='most_recent'):
     [Input('chart-dropdown', 'value'),
      Input('dropdown-states', 'value'),
      Input('tabs-example', 'value'),
-     Input('left-chart', 'selectedData')],
+     Input('left-chart', 'selectedData'),
+     Input('right-chart', 'selectedData'),
+     ],
 )
-def update_right_chart(selected_column, selected_states, selected_tab, selected_data):
+def update_right_chart(selected_column, selected_states, selected_tab, selected_data, self_selected_data):
     """
     Displays / Updates the chart on the right based on input.
     Changing any value redraws the chart.
@@ -563,8 +565,15 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
     :param selected_states:
     :param selected_tab:
     :param selected_data:
+    :param self_selected_data: Included to read this property from context and prevent self-upating
     :return:
     """
+    # prevent updating if the value is selected on the map (to keep the selected states from refreshing)
+    ctx = dash.callback_context
+    if ctx.triggered:
+        if ctx.triggered[0]['prop_id'] == 'right-chart.selectedData':
+            raise PreventUpdate
+
     if selected_tab == 'tab-boxplot':
         if len(selected_states) > 0:
             figure = plot_box_plotly_static(df_rki_orig, selected_column, selected_states)
@@ -677,9 +686,10 @@ def update_left_chart_2_title(selected_column, n_clicks):
 # @app.callback(
 #     Output('left-chart-2-title', 'children'),
 #     [Input('main-data-selector', 'value'),
-#     Input('dropdown-states', 'value')
+#     Input('dropdown-states', 'value'),
+#     Input('right-chart', 'selectedData'),
 #     ])
-# def test_update_left_chart_title(value, value2):
+# def test_update_left_chart_2_title(value, value2, value3):
 #     """
 #     Test Callback to print values returned by selectedData object.
 #     Keep it commented out if not debugging.
