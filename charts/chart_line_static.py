@@ -9,7 +9,7 @@ def plot_lines_plotly(df_unfiltered, lands, column, _colors=colors.diverging.Tem
                       title=False, show_doubling=True, doubling_days=7, showlegend=False):
 
     df = df_unfiltered.loc[df_unfiltered.land.isin(lands), ['land', column, 'date',
-                                                            'confirmed_peak_date']] #.dropna().sort_values(by=['land', 'date'], ascending=[True, True])
+                                                            'confirmed_peak_date']]
     df.set_index('date', inplace=True, drop=False)
 
     del df_unfiltered

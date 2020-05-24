@@ -108,6 +108,8 @@ FEATURE_DROP_DOWN = {
     "transit": "Transit traffic relative to January 2020",
 }
 
+BASE_COLUMNS = ['land', 'date', 'iso_code', 'region_wb', 'population_100k', 'confirmed_peak_date']
+
 # TODO: REMOVE TEMP SOLUTION TO DISPLAY ALL COLUMNS
 for col in df_rki_orig.columns:
     if col not in FEATURE_DROP_DOWN.keys():
@@ -429,13 +431,11 @@ def moving_average_7d(df, selected_column, selected_states):
     :return:
     """
     df = df.loc[df.land.isin(selected_states)].reset_index(drop=True)
-    index = df.index
     ro = df.groupby('land').rolling(7, on='date').mean().reset_index(drop=False).loc[:,
          ['date', 'land', selected_column]].round(2)
     df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly'))
     selected_column += '_weekly'
-    df.index = index
-    return df.dropna(), selected_column
+    return df.dropna(how='all', subset=[selected_column]), selected_column
 
 
 @app.callback(
@@ -470,7 +470,6 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
     if len(selected_states) > 0:  # In case all states are deselected
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
-
         figure = plot_lines_plotly(df, selected_states, selected_column,
                                    show_doubling=True, doubling_days=7, showlegend=False,
                                    _colors=COLORS['charts'])
