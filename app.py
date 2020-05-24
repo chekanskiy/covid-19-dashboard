@@ -27,6 +27,7 @@ df_jh_world.rename_axis('date_index', axis=1, inplace=True)
 
 df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv').round(2)
 df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
+
 json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
 # ========================================= END LOAD DATA ====================================================
 
@@ -102,6 +103,7 @@ FEATURE_DROP_DOWN = {
     "dead": "Deaths: Total",
     "dead_per_100k": "Dead: Total per 100k of Population",
     "dead_change_per_100k": "Deaths: Daily per 100k of Population",
+    "lethality": "Deaths: % of Confirmed Cases",
     "dead_doubling_days": "Deaths: Days to Double Total Number",
     "driving": "Driving traffic relative to January 2020",
     "walking": "Walking traffic relative to January 2020",
@@ -650,7 +652,8 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
 
         if '100k' in selected_column or selected_column in \
                 ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
-                 'dead_change_pct_3w', 'dead_doubling_days_3w_avg3'):
+                 'dead_change_pct_3w', 'dead_doubling_days_3w_avg3',
+                 'lethality'):
 
             if 'doubling_days' in selected_column:
                 df = df.loc[df[selected_column] > 0].sort_values(selected_column, ascending=True).head(30)
