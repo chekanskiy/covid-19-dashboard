@@ -20,15 +20,14 @@ from charts.chart_sunburst_static import plot_sunburst_static
 from charts.chart_bar_static import plot_bar_static
 
 # ============================================ LOAD DATA =====================================================
-df_jh_world = pd.read_csv('data/data_jhu_world.csv')
-df_jh_world.loc[:, 'population_100k'] = df_jh_world.loc[:, 'population_wb'] / 100000
+df_jh_world = pd.read_csv('data/data_jhu_world.csv').round(2)
 df_jh_world['date'] = df_jh_world['date'].astype('datetime64[ns]')
 df_jh_world.index = df_jh_world.date
 df_jh_world.rename_axis('date_index', axis=1, inplace=True)
 
-df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
+df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv').round(2)
 df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
-geojson = json.load(open('data/data_geo_de.json', 'r'))
+json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
 # ========================================= END LOAD DATA ====================================================
 
 # ========================================= CREATE APP =======================================================
@@ -65,7 +64,7 @@ COLORS = {
     'background': '#1f2630',
     'text': '#2cfec1',
     # 'charts': colors.diverging.Temps * 3
-    'charts': colors.diverging.Tealrose * 3,  # 'YlGnBu',
+    'charts': colors.diverging.Tealrose * 10,  # 'YlGnBu',
     'map': colors.sequential.PuBu  # 'YlGnBu',
 }
 
@@ -438,8 +437,8 @@ def moving_average_7d(df, selected_column):
     index = df.index
     df = df.reset_index(drop=True)
     ro = df.groupby('land').rolling(7, on='date').mean().reset_index(drop=False).loc[:,
-         ['date', 'land', selected_column]]
-    df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly')).round(3)
+         ['date', 'land', selected_column]].round(2)
+    df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly'))
     selected_column += '_weekly'
     df.index = index
     return df, selected_column
@@ -531,20 +530,20 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
     return figure
 
 
-def update_right_chart_map(selected_column, selected_date='most_recent'):
-    """
-    Helper function that filters the data for the Map Chart
-    :param selected_column:
-    :param selected_date:
-    :return: figure
-    """
-    df = df_rki_orig.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
-    if selected_date == 'most_recent':
-        df = df.loc[df.index == df.index.max()]
-    else:
-        df = df.loc[df.index == selected_date]
-    figure = plot_map_go(df, geojson, selected_column, _colors=COLORS['map'])
-    return figure
+# def update_right_chart_map(df, selected_column, selected_date='most_recent'):
+#     """
+#     Helper function that filters the data for the Map Chart
+#     :param selected_column:
+#     :param selected_date:
+#     :return: figure
+#     """
+#     df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
+#     if selected_date == 'most_recent':
+#         df = df.loc[df.index == df.index.max()]
+#     else:
+#         df = df.loc[df.index == selected_date]
+#     figure = plot_map_go(df, json_geo_de, selected_column, _colors=COLORS['map'])
+#     return figure
 
 
 @app.callback(
@@ -554,9 +553,11 @@ def update_right_chart_map(selected_column, selected_date='most_recent'):
      Input('tabs-example', 'value'),
      Input('left-chart', 'selectedData'),
      Input('right-chart', 'selectedData'),
+     Input('main-data-selector', 'value'),
      ],
 )
-def update_right_chart(selected_column, selected_states, selected_tab, selected_data, self_selected_data):
+def update_right_chart(selected_column, selected_states, selected_tab, selected_data, self_selected_data,
+                       world_vs_germany):
     """
     Displays / Updates the chart on the right based on input.
     Changing any value redraws the chart.
@@ -574,9 +575,14 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         if ctx.triggered[0]['prop_id'] == 'right-chart.selectedData':
             raise PreventUpdate
 
+    if world_vs_germany == 'GER':
+        df = df_rki_orig
+    else:
+        df = df_jh_world
+
     if selected_tab == 'tab-boxplot':
         if len(selected_states) > 0:
-            figure = plot_box_plotly_static(df_rki_orig, selected_column, selected_states)
+            figure = plot_box_plotly_static(df, selected_column, selected_states)
         else:
             figure = BASE_FIGURE
         return figure
@@ -585,7 +591,22 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
             selected_date = 'most_recent'
         else:
             selected_date = selected_data['points'][-1]['x']
-        return update_right_chart_map(selected_column, selected_date)
+
+        df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
+        if selected_date == 'most_recent':
+            df = df.loc[df.index == df.index.max()]
+        else:
+            df = df.loc[df.index == selected_date]
+        if world_vs_germany == 'WRLD':
+            geojson = None
+            projection = 'equirectangular'
+        else:
+            projection = 'mercator'
+            geojson = json_geo_de
+        figure = plot_map_go(df, selected_column, geojson, _colors=COLORS['map'],
+                             projection=projection)
+        return figure
+        # return update_right_chart_map(df, selected_column, selected_date)
 
 
 def select_value_for_boxplot(selected_column):

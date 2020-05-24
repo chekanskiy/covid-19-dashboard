@@ -28,8 +28,14 @@ from plotly import colors
 #     return fig
 
 
-def plot_map_go(df, geojson, column, _colors=colors.diverging.Temps * 3):
+def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
+                projection='mercator'):
     color = '#1f2630'
+
+    average_score = df[column].median()
+    min_score = df[column].quantile(.1)
+    max_score = df[column].quantile(.9)
+
     fig = go.Figure(data=go.Choropleth(
         locations=df['iso_code'],
         geojson=geojson,
@@ -42,6 +48,9 @@ def plot_map_go(df, geojson, column, _colors=colors.diverging.Temps * 3):
         # zmin=0,
         marker_line_color='#7fafdf',
         marker_line_width=0.5,
+        zmid=average_score,
+        zmax=max_score,
+        zmin=min_score,
         # colorbar_tickprefix = '$',
         # colorbar_title='Confirmed Cases',
         showscale=False,
@@ -53,7 +62,12 @@ def plot_map_go(df, geojson, column, _colors=colors.diverging.Temps * 3):
         clickmode='event+select',
         geo=dict(
             showframe=False,
-            projection_type="mercator", #go.layout.geo.Projection(type = 'Natural earth'), #'equirectangular'
+            projection=dict(type=projection, scale=1,
+                            ),
+            # center=dict(lon=0,
+            #             lat=0)
+            # projection_type="mercator", #go.layout.geo.Projection(type = 'Natural earth'), #'equirectangular'
+            # scale=0.5
         ),
         plot_bgcolor=color,
         paper_bgcolor=color,
