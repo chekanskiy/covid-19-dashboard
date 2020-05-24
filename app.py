@@ -237,10 +237,10 @@ app.layout = html.Div(
                                          ),
                                 html.Div(children=[
                                     html.Div(
-                                        id='div-button-weekly-mobility',
+                                        id='div-button-weekly-2',
                                         className='div-button-weekly-average',
                                         children=dbc.Button(children="7 Day Avg Off/On",
-                                                            id='button-weekly-mobility', size='sm', color="info"),
+                                                            id='button-weekly-2', size='sm', color="info"),
                                         style={'display': 'inline-block'}),
                                     html.Div(html.P(
                                         id="left-chart-2-title", ),
@@ -388,6 +388,19 @@ def update_states_selection_world(selected_data, world_vs_germany, drop_down_sta
     return options, value
 
 
+def weekly_button_logic(n_clicks):
+    if n_clicks is None or n_clicks % 2 == 0:
+        name = "7 DAY AVG IS OFF"
+        action = 0
+        title_addition = ', by day'
+    else:
+        name = "7 DAY AVG IS ON"
+        action = 1
+        title_addition = ', 7 day moving average'
+
+    return {'action': action, 'name': name, 'title_addition': title_addition}
+
+
 @app.callback(
     Output("button-weekly-top", "children"),
     [Input("button-weekly-top", "n_clicks")])
@@ -398,15 +411,12 @@ def update_weekly_button(n_clicks):
     :param n_clicks:
     :return:
     """
-    if n_clicks is None or n_clicks % 2 == 0:
-        return "7 DAY AVG IS OFF"
-    else:
-        return "7 DAY AVG IS ON"
+    return weekly_button_logic(n_clicks)['name']
 
 
 @app.callback(
-    Output("button-weekly-mobility", "children"),
-    [Input("button-weekly-mobility", "n_clicks")])
+    Output("button-weekly-2", "children"),
+    [Input("button-weekly-2", "n_clicks")])
 def update_weekly_button_2(n_clicks):
     """
     Changes the name displayed on the button button-weekly-left-chart-2
@@ -414,10 +424,7 @@ def update_weekly_button_2(n_clicks):
     :param n_clicks:
     :return:
     """
-    if n_clicks is None or n_clicks % 2 == 0:
-        return "7 DAY AVG IS OFF"
-    else:
-        return "7 DAY AVG IS ON"
+    return weekly_button_logic(n_clicks)['name']
 
 
 def moving_average_7d(df, selected_column):
@@ -468,9 +475,7 @@ def update_left_chart(selected_column, selected_states, world_vs_germany , n_cli
                 selected_states = DEFAULT_VALUE_WORLD
 
     if len(selected_states) > 0:  # In case all states are deselected
-        if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-            pass
-        else:
+        if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column)
 
         figure = plot_lines_plotly(df, selected_states, selected_column,
@@ -486,12 +491,12 @@ def update_left_chart(selected_column, selected_states, world_vs_germany , n_cli
     [Input('dropdown-states', 'value'),
      Input('chart-dropdown-2', 'value'),
      Input('main-data-selector', 'value'),
-     Input("button-weekly-mobility", "n_clicks")
+     Input("button-weekly-2", "n_clicks")
     ])
 def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_clicks):
     """
     Displays / Updates the left chart.
-    Number of clicks on the button-weekly-mobility object define how the data is filtered
+    Number of clicks on the button-weekly-2 object define how the data is filtered
     No averaging by default
     :param selected_column:
     :param selected_states:
@@ -514,15 +519,13 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
 
     if len(selected_states) > 0:  # In case all states are deselected
 
-        if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-            figure = plot_lines_plotly(df, selected_states, selected_column,
-                                       show_doubling=False, doubling_days=7, showlegend=False,
-                                       _colors=COLORS['charts'])
-        else:
+        if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column)
-            figure = plot_lines_plotly(df, selected_states, selected_column,
-                                       show_doubling=False, doubling_days=7, showlegend=False,
-                                       _colors=COLORS['charts'])
+
+        figure = plot_lines_plotly(df, selected_states, selected_column,
+                                   show_doubling=False, doubling_days=7, showlegend=False,
+                                   _colors=COLORS['charts'])
+
     else:  # Default figure is displayed initially, on refresh and when no states are selected
         figure = BASE_FIGURE
     return figure
@@ -632,17 +635,17 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
 #     Output('right-chart-2-title', 'children'),
 #     [Input('chart-dropdown', 'value'),
 #     ])
-def update_right_chart_2_title(selected_column):
-    """
-    Updates the Title of the left chart based on  the value selected in the right drop-down menu and
-    the state of the button selecting averaging
-    :param selected_column:
-    :param n_clicks:
-    :return: string: Title to display
-    """
-    selected_column = select_value_for_boxplot(selected_column)
-
-    return "Global " + FEATURE_DROP_DOWN[selected_column]
+# def update_right_chart_2_title(selected_column):
+#     """
+#     Updates the Title of the left chart based on  the value selected in the right drop-down menu and
+#     the state of the button selecting averaging
+#     :param selected_column:
+#     :param n_clicks:
+#     :return: string: Title to display
+#     """
+#     selected_column = select_value_for_boxplot(selected_column)
+#
+#     return "Global " + FEATURE_DROP_DOWN[selected_column]
 
 
 @app.callback(
@@ -654,33 +657,22 @@ def update_left_chart_title(selected_column, n_clicks):
     """
     Updates the Title of the left chart based on  the value selected in the right drop-down menu and
     the state of the button selecting averaging
-    :param selected_column:
-    :param n_clicks:
-    :return: string: Title to display
     """
-    if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-        return FEATURE_DROP_DOWN[selected_column] + ', by day'
-    else:
-        return FEATURE_DROP_DOWN[selected_column] + ', 7 day moving average'
+    return FEATURE_DROP_DOWN[selected_column] + weekly_button_logic(n_clicks)['title_addition']
 
 
 @app.callback(
     Output('left-chart-2-title', 'children'),
     [Input('chart-dropdown-2', 'value'),
-     Input("button-weekly-top", "n_clicks")
+     Input("button-weekly-2", "n_clicks")
     ])
 def update_left_chart_2_title(selected_column, n_clicks):
     """
     Updates the Title of the left chart based on  the value selected in the right drop-down menu and
     the state of the button selecting averaging
-    :param selected_column:
-    :param n_clicks:
-    :return: string: Title to display
     """
-    if n_clicks is None or n_clicks % 2 == 0:  # Button is Un-clicked or Clicked even number of times.
-        return FEATURE_DROP_DOWN[selected_column] + ', by day'
-    else:
-        return FEATURE_DROP_DOWN[selected_column] + ', 7 day moving average'
+    return FEATURE_DROP_DOWN[selected_column] + weekly_button_logic(n_clicks)['title_addition']
+
 
 # @app.callback(
 #     Output('left-chart-2-title', 'children'),
