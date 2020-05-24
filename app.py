@@ -420,7 +420,7 @@ def update_weekly_button_2(n_clicks):
     return weekly_button_logic(n_clicks)['name']
 
 
-def moving_average_7d(df, selected_column):
+def moving_average_7d(df, selected_column, selected_states):
     """
     Adds a column to the df with the 7days moving average of the selected column for
     each 'land' individually
@@ -428,8 +428,8 @@ def moving_average_7d(df, selected_column):
     :param selected_column:
     :return:
     """
+    df = df.loc[df.land.isin(selected_states)].reset_index(drop=True)
     index = df.index
-    df = df.reset_index(drop=True)
     ro = df.groupby('land').rolling(7, on='date').mean().reset_index(drop=False).loc[:,
          ['date', 'land', selected_column]].round(2)
     df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly'))
@@ -469,7 +469,7 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
 
     if len(selected_states) > 0:  # In case all states are deselected
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
-            df, selected_column = moving_average_7d(df, selected_column)
+            df, selected_column = moving_average_7d(df, selected_column, selected_states)
 
         figure = plot_lines_plotly(df, selected_states, selected_column,
                                    show_doubling=True, doubling_days=7, showlegend=False,
@@ -513,7 +513,7 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
     if len(selected_states) > 0:  # In case all states are deselected
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
-            df, selected_column = moving_average_7d(df, selected_column)
+            df, selected_column = moving_average_7d(df, selected_column, selected_states)
 
         figure = plot_lines_plotly(df, selected_states, selected_column,
                                    show_doubling=False, doubling_days=7, showlegend=False,

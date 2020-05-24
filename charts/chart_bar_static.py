@@ -75,8 +75,9 @@ def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=
                           #         tickfont_size=14,
                           tickfont_color=text_color
                       ),
+                      legend_orientation="h",
                       legend=dict(
-                          x=0.6,
-                          y=1,)
+                          x=0,
+                          y=1.3,)
                       )
     return fig
