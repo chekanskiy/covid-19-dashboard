@@ -103,12 +103,28 @@
     height: 139rem;
 }
 
+#dropdown-and-tab-container {
+        padding: 0 0 0 0;
+        margin: 0 0 0 0;
+        background-color: #252e3f;
+    }
+
+#right-chart-container {
+        padding: 0 0 0 0;
+        margin: 0 0 0 0;
+        background-color: #252e3f;
+    }
+
 #right-chart {
-        padding: 0 0 2rem 0
+        padding: 0 0 2rem 0;
     }
 
 #chart-dropdown {
-    padding: 0 0 2rem 0;
+    padding: 0 0 1rem 0;
+}
+
+#chart-dropdown-2 {
+    padding: 0 0 1rem 0;
 }
 
 #right-chart-2-title {

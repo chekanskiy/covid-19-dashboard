@@ -78,6 +78,7 @@ def plot_sunburst_static(df, value_column,
         marker=dict(
             colors=fraction_series,
             colorscale=_colors,
+            # reversescale=True,
             cmid=average_score,
             cmax=max_score,
             cmin=min_score

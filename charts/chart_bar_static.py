@@ -1,4 +1,5 @@
 import plotly.graph_objects as go
+from plotly import colors
 
 #  aliceblue, antiquewhite, aqua, aquamarine, azure,
 #             beige, bisque, black, blanchedalmond, blue,
@@ -37,22 +38,24 @@ import plotly.graph_objects as go
 #             yellow, yellowgreen
 
 
-def plot_bar_static(df, selected_column):
+def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=colors.diverging.Temps):
     bg_color = '#1f2630'
     text_color = '#2cfec1'
     gray_color = 'rgb(204, 204, 204)'
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=df['land'],
-        y=df[selected_column],
-        #     name='Name',
-        marker=dict(color='lightskyblue',
-                    opacity=0.7,
-                    line=dict(
-                        color=gray_color,
-                        width=1
-                    )
-                    )))
+    categories_sorted = df.groupby(by=categories_column)[selected_column].sum().sort_values(ascending=False).index
+    for i, region in enumerate(categories_sorted):
+        fig.add_trace(go.Bar(
+            x=df.loc[df[categories_column] == region, 'land'],
+            y=df.loc[df[categories_column] == region, selected_column],
+            name=region,
+            marker=dict(color=_colors[i],  # 'lightskyblue',
+                        opacity=0.7,
+                        line=dict(
+                            color=gray_color,
+                            width=1
+                        )
+                        )))
 
     # Here we modify the tickangle of the xaxis, resulting in rotated labels.
     fig.update_layout(barmode='group', xaxis_tickangle=-90,
@@ -61,17 +64,19 @@ def plot_bar_static(df, selected_column):
                       yaxis=dict(
                           showline=True,
                           showgrid=False,
-                          #         title='USD (millions)',
+                          #         title='',
                           #         titlefont_size=16,
                           #         tickfont_size=14,
                           tickfont_color=text_color
                       ),
                       xaxis=dict(
-                          #         title='USD (millions)',
+                          #         title='',
                           #         titlefont_size=16,
                           #         tickfont_size=14,
                           tickfont_color=text_color
+                      ),
+                      legend=dict(
+                          x=0.6,
+                          y=1,)
                       )
-
-                      , )
     return fig

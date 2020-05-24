@@ -33,7 +33,7 @@ json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
 # ========================================= CREATE APP =======================================================
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__,
-                meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1.0"}],)
+                meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1.0"}], )
 # external_stylesheets=external_stylesheets)
 server = app.server
 
@@ -58,25 +58,35 @@ STATES = {'BW': 'Baden-Wuerttemberg',
 COUNTRIES = sorted(df_jh_world.land.unique())
 
 DEFAULT_VALUE_GERMANY = ['Hamburg', 'Bremen', 'Berlin']
-DEFAULT_VALUE_WORLD = ['Germany', 'Russia', 'Italy']
+DEFAULT_VALUE_WORLD = ['Germany', 'Russia', 'Italy', 'Sweden', 'United Kingdom']
 
 COLORS = {
     'background': '#1f2630',
     'text': '#2cfec1',
     # 'charts': colors.diverging.Temps * 3
     'charts': colors.diverging.Tealrose * 10,  # 'YlGnBu',
-    'map': colors.sequential.PuBu  # 'YlGnBu',
+    'map': [[0.0, "rgb(165,0,38)"],
+            [0.1111111111111111, "rgb(215,48,39)"],
+            [0.2222222222222222, "rgb(244,109,67)"],
+            [0.3333333333333333, "rgb(253,174,97)"],
+            [0.4444444444444444, "rgb(254,224,144)"],
+            [0.5555555555555556, "rgb(224,243,248)"],
+            [0.6666666666666666, "rgb(171,217,233)"],
+            [0.7777777777777778, "rgb(116,173,209)"],
+            [0.8888888888888888, "rgb(69,117,180)"],
+            [1.0, "rgb(49,54,149)"]]
+    # colors.sequential.PuBu  # 'YlGnBu',
 }
 
 BASE_FIGURE = dict(
-                data=[dict(x=0, y=0)],
-                layout=dict(
-                    paper_bgcolor=COLORS['background'],
-                    plot_bgcolor=COLORS['background'],
-                    autofill=True,
-                    margin=dict(t=75, r=50, b=100, l=50),
-                            ),
-                    )
+    data=[dict(x=0, y=0)],
+    layout=dict(
+        paper_bgcolor=COLORS['background'],
+        plot_bgcolor=COLORS['background'],
+        autofill=True,
+        margin=dict(t=75, r=50, b=100, l=50),
+    ),
+)
 
 FEATURE_DROP_DOWN = {
     "confirmed_change": "Cases: Daily",
@@ -107,6 +117,7 @@ TABS_STYLES = {
     'height': '6rem',
     'borderBottom': '0px solid #7fafdf',
     'padding': '0 0 0 0',
+    'backgroundColor': '#252e3f',
 }
 
 TAB_STYLE = {
@@ -144,35 +155,35 @@ app.layout = html.Div(
             id='header',
             children=[
                 # html.Img(id="logo", src=app.get_asset_url("dash-logo.png")),
-                html.H4(children='COVID-19 in Germany', #style={ 'textAlign': 'left', 'color': colors['text']}
-                        ),]
+                html.H4(children='COVID-19 in Germany',  # style={ 'textAlign': 'left', 'color': colors['text']}
+                        ), ]
         ),
         html.Div(children=[
-                html.P(
-                    id="description",
-                    children="Fully interactive dashboard",
-                                 ),],
-                style={
-                    'width': '10%',
-                    'display': 'inline-block',
-                }
-                ),
+            html.P(
+                id="description",
+                children="Fully interactive dashboard",
+            ), ],
+            style={
+                'width': '10%',
+                'display': 'inline-block',
+            }
+        ),
         html.Div(children=[
-                dcc.RadioItems(
-                    id="main-data-selector",
-                    options=[
-                        {'label': 'Germany', 'value': 'GER'},
-                        {'label': 'World', 'value': 'WRLD'}
-                    ],
-                    value='GER',
-                    labelStyle={'display': 'inline-block'}
-                                ),
+            dcc.RadioItems(
+                id="main-data-selector",
+                options=[
+                    {'label': 'Germany', 'value': 'GER'},
+                    {'label': 'World', 'value': 'WRLD'}
+                ],
+                value='WRLD',
+                labelStyle={'display': 'inline-block'}
+            ),
         ],
-                style={
-                       'width': '15%',
-                       'display': 'inline-block',
-                       }
-                    ),
+            style={
+                'width': '15%',
+                'display': 'inline-block',
+            }
+        ),
         html.Div(
             id="app-container",
             children=[
@@ -197,11 +208,11 @@ app.layout = html.Div(
                                         #          "value": str(state),
                                         #         }
                                         #         for state, iso in zip(STATES.values(), STATES.keys())],
-                                                    ),
+                                    ),
                                     style={
-                                            'width': '100%',
-                                            'display': 'inline-block',
-                                           }
+                                        'width': '100%',
+                                        'display': 'inline-block',
+                                    }
                                 )
                                 # html.Div(dcc.DatePickerRange(
                                 #     id='date-picker-range',
@@ -221,19 +232,19 @@ app.layout = html.Div(
                                         id='div-button-weekly-top',
                                         className='div-button-weekly-average',
                                         children=dbc.Button(
-                                                            children="7 Day Avg Off/On",
-                                                            id='button-weekly-top', size='sm', color="info"),
+                                            children="7 Day Avg Off/On",
+                                            id='button-weekly-top', size='sm', color="info"),
                                         style={'display': 'inline-block'}),
                                     html.Div(html.P(
-                                        id="left-chart-title",),
-                                        style={'display': 'inline-block',}
-                                            ),
-                                                ],
-                                        ),
+                                        id="left-chart-title", ),
+                                        style={'display': 'inline-block', }
+                                    ),
+                                ],
+                                ),
                                 dcc.Graph(
                                     id='left-chart',
                                     figure=BASE_FIGURE
-                                         ),
+                                ),
                                 html.Div(children=[
                                     html.Div(
                                         id='div-button-weekly-2',
@@ -251,7 +262,7 @@ app.layout = html.Div(
                                 dcc.Graph(
                                     id='left-chart-2',
                                     figure=BASE_FIGURE
-                                         ),
+                                ),
                                 # dcc.Loading(
                                 #     id="loading-1",
                                 #     type="circle",
@@ -259,8 +270,8 @@ app.layout = html.Div(
                                 #
                                 #             ])
                             ])
-                            ]
-                        ),
+                    ]
+                ),
                 html.Div(
                     id="right-column",
                     children=[
@@ -279,16 +290,16 @@ app.layout = html.Div(
                                          className='custom-tabs-container',
                                          value='tab-map',
                                          children=[
-                                            dcc.Tab(label='Map Tab', value='tab-map',
-                                                    style=TAB_STYLE,
-                                                    selected_style=TAB_SELECTED_STYLE
-                                                    ),
-                                            dcc.Tab(label='Boxplot Tab', value='tab-boxplot',
-                                                    style=TAB_STYLE,
-                                                    selected_style=TAB_SELECTED_STYLE
-                                                    ),
-                                                    ], style=TABS_STYLES),
-                                ]),
+                                             dcc.Tab(label='Map Tab', value='tab-map',
+                                                     style=TAB_STYLE,
+                                                     selected_style=TAB_SELECTED_STYLE
+                                                     ),
+                                             dcc.Tab(label='Boxplot Tab', value='tab-boxplot',
+                                                     style=TAB_STYLE,
+                                                     selected_style=TAB_SELECTED_STYLE
+                                                     ),
+                                         ], style=TABS_STYLES),
+                            ]),
                         html.Div(
                             id='right-chart-container',
                             children=[
@@ -296,7 +307,8 @@ app.layout = html.Div(
                                     dcc.Graph(
                                         id="right-chart",
                                         figure=BASE_FIGURE,
-                                            ),],
+                                    ), ],
+                                    style={'backgroundColor': '#252e3f'}
                                 ),
                                 html.Div(
                                     id='dropdown-2-container',
@@ -306,9 +318,9 @@ app.layout = html.Div(
                                             id="chart-dropdown-2",
                                             options=[{'label': l, 'value': v} for l, v in
                                                      zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                                            value="confirmed_change",
+                                            value="dead_change_per_100k",
 
-                                ),]),
+                                        ), ]),
                                 # html.Div(html.P(
                                 #     children=' ',
                                 #     id="right-chart-2-title", ),
@@ -317,39 +329,21 @@ app.layout = html.Div(
                                 html.Div(children=[dcc.Graph(
                                     id="right-chart-2",
                                     figure=BASE_FIGURE, )],
-                                        )
-                        ]),
-                            ],
-                        )
-                ]
-                    )
+                                )
+                            ]),
+                    ],
+                )
+            ]
+        )
     ])
-
-
-# @app.callback(
-#     Output('dropdown-states', 'value'),
-#     [Input('right-chart', 'selectedData'),],
-#     [State('dropdown-states', 'value')])
-# def update_states_selection_from_map(selected_data, drop_down_states):
-#     """
-#     Selecting the data on the Map Chart updates the values in the
-#     Dropdown Menu on the left
-#     :param selected_data:
-#     :param drop_down_states:
-#     :return: list of values for the Dropdown Menu
-#     """
-#     if selected_data is None:
-#         return drop_down_states
-#     else:
-#
 
 
 @app.callback(
     [Output('dropdown-states', 'options'),
      Output('dropdown-states', 'value')],
     [Input('right-chart', 'selectedData'),
-     Input('main-data-selector', 'value'),],
-     [State('dropdown-states', 'value')])
+     Input('main-data-selector', 'value'), ],
+    [State('dropdown-states', 'value')])
 def update_states_selection_world(selected_data, world_vs_germany, drop_down_states):
     """
 
@@ -388,7 +382,7 @@ def update_states_selection_world(selected_data, world_vs_germany, drop_down_sta
 
 
 def weekly_button_logic(n_clicks):
-    if n_clicks is None or n_clicks % 2 == 0:
+    if not (n_clicks is None or n_clicks % 2 == 0):
         name = "7 DAY AVG IS OFF"
         action = 0
         title_addition = ', by day'
@@ -450,8 +444,8 @@ def moving_average_7d(df, selected_column):
      Input('dropdown-states', 'value'),
      Input('main-data-selector', 'value'),
      Input("button-weekly-top", "n_clicks")
-    ])
-def update_left_chart(selected_column, selected_states, world_vs_germany , n_clicks):
+     ])
+def update_left_chart(selected_column, selected_states, world_vs_germany, n_clicks):
     """
     Displays / Updates the left chart.
     Number of clicks on the button-weekly-top object define how the data is filtered
@@ -491,7 +485,7 @@ def update_left_chart(selected_column, selected_states, world_vs_germany , n_cli
      Input('chart-dropdown-2', 'value'),
      Input('main-data-selector', 'value'),
      Input("button-weekly-2", "n_clicks")
-    ])
+     ])
 def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_clicks):
     """
     Displays / Updates the left chart.
@@ -600,11 +594,13 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         if world_vs_germany == 'WRLD':
             geojson = None
             projection = 'equirectangular'
+            fitbounds = None
         else:
             projection = 'mercator'
             geojson = json_geo_de
+            fitbounds = 'locations'
         figure = plot_map_go(df, selected_column, geojson, _colors=COLORS['map'],
-                             projection=projection)
+                             projection=projection, fitbounds=fitbounds)
         return figure
         # return update_right_chart_map(df, selected_column, selected_date)
 
@@ -654,6 +650,7 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
             figure = plot_bar_static(df, selected_column)
         else:
             figure = plot_sunburst_static(df, selected_column,
+                                          # _colors=COLORS['map'],
                                           color_columns=[selected_column, 'population_100k'],
                                           value_column_name=FEATURE_DROP_DOWN[selected_column])
     else:
@@ -682,7 +679,7 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
     Output('left-chart-title', 'children'),
     [Input('chart-dropdown', 'value'),
      Input("button-weekly-top", "n_clicks")
-    ])
+     ])
 def update_left_chart_title(selected_column, n_clicks):
     """
     Updates the Title of the left chart based on  the value selected in the right drop-down menu and
@@ -695,7 +692,7 @@ def update_left_chart_title(selected_column, n_clicks):
     Output('left-chart-2-title', 'children'),
     [Input('chart-dropdown-2', 'value'),
      Input("button-weekly-2", "n_clicks")
-    ])
+     ])
 def update_left_chart_2_title(selected_column, n_clicks):
     """
     Updates the Title of the left chart based on  the value selected in the right drop-down menu and

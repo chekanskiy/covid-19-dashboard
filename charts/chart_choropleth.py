@@ -29,7 +29,7 @@ from plotly import colors
 
 
 def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
-                projection='mercator'):
+                projection='mercator', fitbounds='locations'):
     color = '#1f2630'
 
     average_score = df[column].median()
@@ -41,9 +41,9 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
         geojson=geojson,
         z=df[column],
         text=df['land'],
-        colorscale=_colors, #'YlGnBu',
+        colorscale= _colors, #'YlGnBu',
+        reversescale=True,
         # autocolorscale=True,
-        # reversescale=False,
         # zmax=20,
         # zmin=0,
         marker_line_color='#7fafdf',
@@ -62,17 +62,17 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
         clickmode='event+select',
         geo=dict(
             showframe=False,
-            projection=dict(type=projection, scale=1,
-                            ),
-            # center=dict(lon=0,
-            #             lat=0)
+            projection=dict(type=projection),
             # projection_type="mercator", #go.layout.geo.Projection(type = 'Natural earth'), #'equirectangular'
-            # scale=0.5
+            lataxis_range=[-55, 85],
+            # lonaxis_range=[0, 200],
+            # center=dict(lon=-30, lat=-30),
+            # projection_rotation=dict(lon=30, lat=30, roll=0),
         ),
         plot_bgcolor=color,
         paper_bgcolor=color,
         autosize=True,
-        # height=600,
+        # height=300,
         # width=1200,
         margin=dict(t=0, b=0, l=0, r=0),
         annotations=[
@@ -89,7 +89,7 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
                           color='#7fafdf'),
                 showarrow=False,
 
-        ),
+            ),
             dict(
                 x=0.05,
                 y=0.96,
@@ -106,21 +106,22 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
         ]
     )
 
-    fig.update_geos(fitbounds='locations',
-                    visible=False,
-                    # resolution=50,
-                    showcoastlines=True,
-                    coastlinecolor=color,
-                    showland=True,
-                    landcolor=color,
-                    showocean=True,
-                    oceancolor=color,
-                    # showlakes=False,
-                    # lakecolor=color,
-                    showcountries=False,
-                    countrycolor=color,
-                    # showrivers=True,
-                    # rivercolor="Blue"
-                    )
+    fig.update_geos(
+        fitbounds=fitbounds,
+        visible=False,
+        # resolution=50,
+        showcoastlines=True,
+        coastlinecolor=color,
+        showland=True,
+        landcolor=color,
+        showocean=True,
+        oceancolor=color,
+        # showlakes=False,
+        # lakecolor=color,
+        showcountries=False,
+        countrycolor=color,
+        # showrivers=True,
+        # rivercolor="Blue"
+    )
 
     return fig
