@@ -165,12 +165,13 @@ app.layout = html.Div(
         html.Div(children=[
             html.P(
                 id="description",
-                children="Fully interactive dashboard. Choose between the world view and the dashboard for Germany. "
-                         "To select countries click on one or select multiple on the map or search in the dropdown menu. "
-                         "To choose a specific date: click on the corresponding point on the top left chart.",
+                children="Fully interactive dashboard. "
+                         "Switch between the world view and the dashboard for Germany. "
+                         "Select countries the map by clicking/dragging or search in the drop-down menu. "
+                         "Choose a specific date by clicking on the corresponding point on the top left chart.",
             ), ],
             style={
-                'width': '35%',
+                'width': '45%',
                 'display': 'inline-block',
             }
         ),
