@@ -82,6 +82,7 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
                 yref='paper',
                 text="Data Sources: <a href='https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Situationsberichte/Gesamt.html'>RKI</a>"
                      ", <a href='https://github.com/CSSEGISandData/COVID-19'>CSSE JHU</a>"
+                     ", <a href='https://data.worldbank.org/'>WB</a>"
                      ", <a href='https://www.apple.com/covid19/mobility'>Apple</a><br>"
                      "<i>Dashboard: <a href='https://www.linkedin.com/in/sergeychekanskiy'>Sergey Chekanskiy</a></i>",
                 font=dict(family='Garamond',
