@@ -55,7 +55,6 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
         # colorbar_title='Confirmed Cases',
         showscale=False,
     ))
-
     fig.update_layout(
         # title_text='Confirmed Cases',
         dragmode="lasso",
@@ -81,9 +80,10 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
                 y=0,
                 xref='paper',
                 yref='paper',
-                text="Data Source: <a href='https://www.rki.de/'>Robert Koch Institute</a>"
+                text="Data Sources: <a href='https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Situationsberichte/Gesamt.html'>RKI</a>"
+                     ", <a href='https://github.com/CSSEGISandData/COVID-19'>CSSE JHU</a>"
                      ", <a href='https://www.apple.com/covid19/mobility'>Apple</a><br>"
-                     "<i>Charts: <a href='https://www.linkedin.com/in/sergeychekanskiy'>Sergey Chekanskiy</a></i>",
+                     "<i>Dashboard: <a href='https://www.linkedin.com/in/sergeychekanskiy'>Sergey Chekanskiy</a></i>",
                 font=dict(family='Garamond',
                           size=12,
                           color='#7fafdf'),
@@ -105,6 +105,7 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
             ),
         ]
     )
+
 
     fig.update_geos(
         fitbounds=fitbounds,
