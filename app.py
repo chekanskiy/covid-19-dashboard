@@ -24,7 +24,6 @@ df_jh_world = pd.read_csv('data/data_jhu_world.csv').round(2)
 df_jh_world['date'] = df_jh_world['date'].astype('datetime64[ns]')
 df_jh_world.index = df_jh_world.date
 df_jh_world.rename_axis('date_index', axis=1, inplace=True)
-
 df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv').round(2)
 df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
 
@@ -472,7 +471,12 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
             elif world_vs_germany == 'WRLD':
                 selected_states = DEFAULT_VALUE_WORLD
 
-    if len(selected_states) > 0:  # In case all states are deselected
+    # Default figure is displayed initially, on refresh and when no states are selected
+    if len(selected_states) == 0 or (world_vs_germany == 'WRLD'
+                                     and selected_column in ['driving', 'walking', 'transit']):
+        figure = BASE_FIGURE
+    # In case all states are deselected
+    else:
         df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
@@ -484,8 +488,6 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
         figure = plot_lines_plotly(df, selected_column,
                                    show_doubling=True, doubling_days=7, showlegend=False,
                                    _colors=COLORS['charts'])
-    else:  # Default figure is displayed initially, on refresh and when no states are selected
-        figure = BASE_FIGURE
     return figure
 
 
@@ -520,7 +522,8 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
             elif world_vs_germany == 'WRLD':
                 selected_states = DEFAULT_VALUE_WORLD
 
-    if len(selected_states) > 0:  # In case all states are deselected
+    if len(selected_states) > 0 and not (world_vs_germany == 'WRLD'
+                                         and selected_column in ['driving', 'walking', 'transit']):
         df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
@@ -536,22 +539,6 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
     else:  # Default figure is displayed initially, on refresh and when no states are selected
         figure = BASE_FIGURE
     return figure
-
-
-# def update_right_chart_map(df, selected_column, selected_date='most_recent'):
-#     """
-#     Helper function that filters the data for the Map Chart
-#     :param selected_column:
-#     :param selected_date:
-#     :return: figure
-#     """
-#     df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
-#     if selected_date == 'most_recent':
-#         df = df.loc[df.index == df.index.max()]
-#     else:
-#         df = df.loc[df.index == selected_date]
-#     figure = plot_map_go(df, json_geo_de, selected_column, _colors=COLORS['map'])
-#     return figure
 
 
 @app.callback(
@@ -582,6 +569,10 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
     if ctx.triggered:
         if ctx.triggered[0]['prop_id'] == 'right-chart.selectedData':
             raise PreventUpdate
+
+    if (world_vs_germany == 'WRLD'
+            and selected_column in ['driving', 'walking', 'transit']):
+        return BASE_FIGURE
 
     if world_vs_germany == 'GER':
         df = df_rki_orig
