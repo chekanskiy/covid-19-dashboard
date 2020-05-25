@@ -159,16 +159,18 @@ app.layout = html.Div(
             id='header',
             children=[
                 # html.Img(id="logo", src=app.get_asset_url("dash-logo.png")),
-                html.H4(children='COVID-19 in Germany',  # style={ 'textAlign': 'left', 'color': colors['text']}
+                html.H4(children='COVID-19 in the World',  # style={ 'textAlign': 'left', 'color': colors['text']}
                         ), ]
         ),
         html.Div(children=[
             html.P(
                 id="description",
-                children="Fully interactive dashboard",
+                children="Fully interactive dashboard. Choose between the world view and the dashboard for Germany. "
+                         "To select countries click on one or select multiple on the map or search in the dropdown menu. "
+                         "To choose a specific date: click on the corresponding point on the top left chart.",
             ), ],
             style={
-                'width': '10%',
+                'width': '35%',
                 'display': 'inline-block',
             }
         ),
