@@ -1,4 +1,4 @@
-from numpy import log10, datetime64, dtype
+from numpy import log10, seterr
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.validators.scatter.marker import SymbolValidator
@@ -7,6 +7,7 @@ from plotly import colors
 
 def plot_lines_plotly(df, column, _colors=colors.diverging.Temps * 3,
                       title=False, show_doubling=True, doubling_days=7, showlegend=False):
+    seterr(divide='ignore')
 
     _doubling_column = f'double_x{doubling_days}'
 

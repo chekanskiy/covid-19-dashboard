@@ -112,10 +112,10 @@ FEATURE_DROP_DOWN = {
 
 BASE_COLUMNS = ['land', 'date', 'iso_code', 'region_wb', 'population_100k', 'confirmed_peak_date']
 
-# TODO: REMOVE TEMP SOLUTION TO DISPLAY ALL COLUMNS
-for col in df_rki_orig.columns:
-    if col not in FEATURE_DROP_DOWN.keys():
-        FEATURE_DROP_DOWN[col] = col
+# REMOVE TEMP SOLUTION TO DISPLAY ALL COLUMNS
+# for col in df_rki_orig.columns:
+#     if col not in FEATURE_DROP_DOWN.keys():
+#         FEATURE_DROP_DOWN[col] = col
 
 TABS_STYLES = {
     'height': '6rem',
