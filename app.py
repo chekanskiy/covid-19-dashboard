@@ -18,6 +18,7 @@ from charts.chart_boxplot_static import plot_box_plotly_static
 from charts.chart_line_static import plot_lines_plotly
 from charts.chart_sunburst_static import plot_sunburst_static
 from charts.chart_bar_static import plot_bar_static
+from charts.chart_gauge_static import plot_gauges
 
 # ============================================ LOAD DATA =====================================================
 df_jh_world = pd.read_csv('data/data_jhu_world.csv').round(2)
@@ -304,6 +305,10 @@ app.layout = html.Div(
                                                      style=TAB_STYLE,
                                                      selected_style=TAB_SELECTED_STYLE
                                                      ),
+                                             dcc.Tab(label='Gauges Tab', value='tab-gauges',
+                                                     style=TAB_STYLE,
+                                                     selected_style=TAB_SELECTED_STYLE
+                                                     ),
                                          ], style=TABS_STYLES),
                             ]),
                         html.Div(
@@ -477,7 +482,8 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
         figure = BASE_FIGURE
     # In case all states are deselected
     else:
-        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date',
+                                                    'region_wb']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
@@ -524,7 +530,7 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
 
     if len(selected_states) > 0 and not (world_vs_germany == 'WRLD'
                                          and selected_column in ['driving', 'walking', 'transit']):
-        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date', 'region_wb']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
@@ -585,17 +591,19 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         else:
             figure = BASE_FIGURE
         return figure
-    if selected_tab == 'tab-map':
-        if selected_data is None:
-            selected_date = 'most_recent'
-        else:
-            selected_date = selected_data['points'][-1]['x']
 
-        df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
-        if selected_date == 'most_recent':
+    elif selected_tab == 'tab-gauges':
+        return plot_gauges(df, selected_column)
+
+    elif selected_tab == 'tab-map':
+        if selected_data is None:
             df = df.loc[df.index == df.index.max()]
         else:
+            selected_date = selected_data['points'][-1]['x']
             df = df.loc[df.index == selected_date]
+
+        df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
+
         if world_vs_germany == 'WRLD':
             geojson = None
             projection = 'equirectangular'
@@ -607,7 +615,6 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         figure = plot_map_go(df, selected_column, geojson, _colors=COLORS['map'],
                              projection=projection, fitbounds=fitbounds)
         return figure
-        # return update_right_chart_map(df, selected_column, selected_date)
 
 
 def select_value_for_boxplot(selected_column):
