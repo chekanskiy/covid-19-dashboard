@@ -65,7 +65,24 @@ COLORS = {
     'background': '#1f2630',
     'text': '#2cfec1',
     # 'charts': colors.diverging.Temps * 3
-    'charts': colors.diverging.Tealrose * 10,  # 'YlGnBu',
+    'charts':
+                # ["#cd87cb",
+                # "#5db248",
+                # "#bf4bb3",
+                # "#afab3d",
+                # "#7860cd",
+                # "#da8b3a",
+                # "#677ec5",
+                # "#c84933",
+                # "#45a8ca",
+                # "#d24074",
+                # "#5cb587",
+                # "#974b7e",
+                # "#367a44",
+                # "#ca6d6c",
+                # "#6e7f34",
+                # "#9f753c"] * 10,
+    colors.diverging.Tealrose * 10,  # 'YlGnBu',
     'map': [[0.0, "rgb(165,0,38)"],
             [0.1111111111111111, "rgb(215,48,39)"],
             [0.2222222222222222, "rgb(244,109,67)"],
@@ -97,8 +114,8 @@ FEATURE_DROP_DOWN = {
     "confirmed_active_cases_per_100k": "Cases: Active per 100k of Population",
     "confirmed_per_100k": "Cases: Total per 100k of Population",
     "confirmed_change_per_100k": "Cases: Daily per 100k of Population",
-    "confirmed_change_pct_3w": "Cases: Daily as % of Rolling 3 Week Sum",
-    "confirmed_doubling_days_3w_avg3": "Cases: Days to Double Rolling 3 Week Sum",
+    # "confirmed_change_pct_3w": "Cases: Daily as % of Rolling 3 Week Sum",
+    # "confirmed_doubling_days_3w_avg3": "Cases: Days to Double Rolling 3 Week Sum",
     "dead_change": "Deaths: Daily",
     "dead": "Deaths: Total",
     "dead_per_100k": "Dead: Total per 100k of Population",
@@ -666,15 +683,8 @@ def update_right_chart_2(selected_column, selected_states, selected_data, world_
                 selected_date = [selected_date]
             df = df.loc[df.date.isin(selected_date)]
 
-        if '100k' in selected_column or selected_column in \
-                ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
-                 'dead_change_pct_3w', 'dead_doubling_days_3w_avg3',
-                 'lethality'):
-
-            if 'doubling_days' in selected_column:
-                df = df.loc[df[selected_column] > 0].sort_values(selected_column, ascending=True).head(30)
-            else:
-                df = df.sort_values(selected_column, ascending=False).head(30)
+        if '_100k' in selected_column or selected_column in ('dead_doubling_days', 'lethality'):
+            df = df.sort_values(selected_column, ascending=False).head(50)
             figure = plot_bar_static(df, selected_column, categories_column)
         else:
             figure = plot_sunburst_static(df, selected_column,

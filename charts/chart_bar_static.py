@@ -8,6 +8,9 @@ def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=
     gray_color = 'rgb(204, 204, 204)'
     fig = go.Figure()
     categories_sorted = df.groupby(by=categories_column)[selected_column].sum().sort_values(ascending=False).index
+    # _min_y_range = df.loc[:, selected_column].quantile(0.01)
+    # _max_y_range = df.loc[:, selected_column].quantile(0.98)
+
     for i, region in enumerate(categories_sorted):
         fig.add_trace(go.Bar(
             x=df.loc[df[categories_column] == region, 'land'],
@@ -31,6 +34,7 @@ def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=
                           #         title='',
                           #         titlefont_size=16,
                           #         tickfont_size=14,
+                          # range=[_min_y_range, _max_y_range],
                           tickfont_color=text_color
                       ),
                       xaxis=dict(
