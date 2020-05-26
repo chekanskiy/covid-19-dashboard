@@ -78,6 +78,13 @@ def plot_bar_static(df, selected_column, categories_column='region_wb', _colors=
                       legend_orientation="h",
                       legend=dict(
                           x=0,
-                          y=1.3,)
+                          y=1.3,),
+                      margin=dict(
+                          autoexpand=True,
+                          l=10,
+                          r=10,
+                          t=50,
+                          b=10,
+                      ),
                       )
     return fig
