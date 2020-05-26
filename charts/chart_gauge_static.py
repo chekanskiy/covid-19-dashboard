@@ -40,7 +40,6 @@ def plot_gauges(df, column):
                         #                         column_widths=[0.3, 0.7],
                         #                         row_heights=[0.5, 0.5],
                         )
-    print(fig.print_grid())
     reg_df_sum_total = df.groupby('region_wb').agg(['sum'])[column].sort_values(by='sum',
                                                                                          ascending=False).round(0)
 
@@ -64,7 +63,6 @@ def plot_gauges(df, column):
             position = [3, i + 1 - 4]
         else:
             position = [4, i + 1 - 6]
-        print(position)
         fig = add_gauge(fig, region, max_value, current_value, yd_value, position)
 
     fig.update_layout(paper_bgcolor='#1f2630',
