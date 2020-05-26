@@ -2,35 +2,9 @@ import plotly.graph_objects as go
 from plotly import colors
 
 
-# def plot_map_express(df, geojson, column):
-#     import plotly.express as px
-#     fig = px.choropleth_mapbox(df, geojson=geojson, locations='iso_code', color=column,
-#                                color_continuous_scale="YlGnBu",
-#                                # range_color=(0, 200000000),
-#                                # mapbox_style="mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz",
-#                                mapbox_style="white-bg", #"carto-darkmatter",
-#                                zoom=4, center = {"lat": 51.2, "lon": 10},
-#                                opacity=1,
-#                                labels={column:column},
-#                                # width=600,
-#                                # height=300
-#                               )
-#     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
-#                       # plot_bgcolor = '#1f2630',
-#                       # paper_bgcolor = '#1f2630'
-#                      )
-#     fig.update_traces(marker=dict(
-#                       # size=1,
-#                       line=dict(width=1,
-#                                 color='#7fafdf')),
-#                       # selector=dict(mode='markers')
-#                       )
-#     return fig
-
-
 def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
                 projection='mercator', fitbounds='locations'):
-    color = '#1f2630'
+    bg_color = '#1f2630'
 
     average_score = df[column].median()
     min_score = df[column].quantile(.1)
@@ -68,8 +42,8 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
             # center=dict(lon=-30, lat=-30),
             # projection_rotation=dict(lon=30, lat=30, roll=0),
         ),
-        plot_bgcolor=color,
-        paper_bgcolor=color,
+        plot_bgcolor=bg_color,
+        paper_bgcolor=bg_color,
         autosize=True,
         # height=300,
         # width=1200,
@@ -113,17 +87,44 @@ def plot_map_go(df, column, geojson=None, _colors=colors.diverging.Temps * 3,
         visible=False,
         # resolution=50,
         showcoastlines=True,
-        coastlinecolor=color,
+        coastlinecolor=bg_color,
         showland=True,
-        landcolor=color,
+        landcolor=bg_color,
         showocean=True,
-        oceancolor=color,
+        oceancolor=bg_color,
         # showlakes=False,
         # lakecolor=color,
         showcountries=False,
-        countrycolor=color,
+        countrycolor=bg_color,
         # showrivers=True,
         # rivercolor="Blue"
     )
 
     return fig
+
+
+
+# def plot_map_express(df, geojson, column):
+#     import plotly.express as px
+#     fig = px.choropleth_mapbox(df, geojson=geojson, locations='iso_code', color=column,
+#                                color_continuous_scale="YlGnBu",
+#                                # range_color=(0, 200000000),
+#                                # mapbox_style="mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz",
+#                                mapbox_style="white-bg", #"carto-darkmatter",
+#                                zoom=4, center = {"lat": 51.2, "lon": 10},
+#                                opacity=1,
+#                                labels={column:column},
+#                                # width=600,
+#                                # height=300
+#                               )
+#     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
+#                       # plot_bgcolor = '#1f2630',
+#                       # paper_bgcolor = '#1f2630'
+#                      )
+#     fig.update_traces(marker=dict(
+#                       # size=1,
+#                       line=dict(width=1,
+#                                 color='#7fafdf')),
+#                       # selector=dict(mode='markers')
+#                       )
+#     return fig

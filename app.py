@@ -482,8 +482,7 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
         figure = BASE_FIGURE
     # In case all states are deselected
     else:
-        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date',
-                                                    'region_wb']]
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
@@ -530,7 +529,7 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
 
     if len(selected_states) > 0 and not (world_vs_germany == 'WRLD'
                                          and selected_column in ['driving', 'walking', 'transit']):
-        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date', 'region_wb']]
+        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
             df, selected_column = moving_average_7d(df, selected_column, selected_states)
@@ -593,14 +592,20 @@ def update_right_chart(selected_column, selected_states, selected_tab, selected_
         return figure
 
     elif selected_tab == 'tab-gauges':
-        return plot_gauges(df, selected_column)
+        if world_vs_germany == 'WRLD':
+            aggregate_by = 'region_wb'
+        else:
+            if len(selected_states) > 0:
+                df = df.loc[df.land.isin(selected_states)]
+            aggregate_by = 'land'
+        return plot_gauges(df, selected_column, aggregate_by)
 
     elif selected_tab == 'tab-map':
         if selected_data is None:
-            df = df.loc[df.index == df.index.max()]
+            df = df.loc[df.date == df.date.max()]
         else:
             selected_date = selected_data['points'][-1]['x']
-            df = df.loc[df.index == selected_date]
+            df = df.loc[df.date == selected_date]
 
         df = df.loc[:, [selected_column, 'land', 'iso_code', 'date']].set_index('date', drop=False)
 
@@ -627,9 +632,10 @@ def select_value_for_boxplot(selected_column):
     Output('right-chart-2', 'figure'),
     [Input('chart-dropdown-2', 'value'),
      Input('dropdown-states', 'value'),
-     Input('left-chart', 'selectedData')],
+     Input('left-chart', 'selectedData'),
+     Input('main-data-selector', 'value')],
 )
-def update_right_chart_2(selected_column, selected_states, selected_data):
+def update_right_chart_2(selected_column, selected_states, selected_data, world_vs_germany):
     """
     Displays / Updates the chart on the right based on input.
     Changing any value redraws the chart.
@@ -642,14 +648,23 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
     """
     selected_column = select_value_for_boxplot(selected_column)
 
+    if world_vs_germany == 'GER':
+        df = df_rki_orig
+        levels = ['land']
+        categories_column = 'land'
+    else:
+        df = df_jh_world
+        levels = ['land', 'region_wb']
+        categories_column = 'region_wb'
+
     if len(selected_states) > 0:
         if selected_data is None:
-            df = df_jh_world.loc[df_jh_world.index == df_jh_world.index.max()]
+            df = df.loc[df.date == df.date.max()]
         else:
             selected_date = selected_data['points'][-1]['x']
             if not isinstance(selected_date, (list, tuple)):
                 selected_date = [selected_date]
-            df = df_jh_world.loc[df_jh_world.index.isin(selected_date)]
+            df = df.loc[df.date.isin(selected_date)]
 
         if '100k' in selected_column or selected_column in \
                 ('confirmed_change_pct_3w', 'confirmed_doubling_days_3w_avg3',
@@ -660,12 +675,13 @@ def update_right_chart_2(selected_column, selected_states, selected_data):
                 df = df.loc[df[selected_column] > 0].sort_values(selected_column, ascending=True).head(30)
             else:
                 df = df.sort_values(selected_column, ascending=False).head(30)
-            figure = plot_bar_static(df, selected_column)
+            figure = plot_bar_static(df, selected_column, categories_column)
         else:
             figure = plot_sunburst_static(df, selected_column,
                                           # _colors=COLORS['map'],
                                           color_columns=[selected_column, 'population_100k'],
-                                          value_column_name=FEATURE_DROP_DOWN[selected_column])
+                                          value_column_name=FEATURE_DROP_DOWN[selected_column],
+                                          levels=levels)
     else:
         figure = BASE_FIGURE
     return figure

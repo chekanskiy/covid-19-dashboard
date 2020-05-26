@@ -10,6 +10,8 @@ def build_hierarchical_dataframe(df, levels, value_column, color_columns=None):
     Levels are given starting from the bottom to the top of the hierarchy,
     ie the last level corresponds to the root.
     """
+    levels = [level for level in levels if level is not None]
+
     if color_columns is not None:
         cols = ['id', 'parent', 'value', 'color']
         df.loc[df[color_columns[0]] < 0, color_columns[0]] = 0
