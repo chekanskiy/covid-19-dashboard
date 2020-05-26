@@ -40,20 +40,48 @@ def plot_gauges(df, column):
                         #                         column_widths=[0.3, 0.7],
                         #                         row_heights=[0.5, 0.5],
                         )
-    reg_df_sum_total = df.groupby('region_wb').agg(['sum'])[column].sort_values(by='sum',
-                                                                                         ascending=False).round(0)
 
-    reg_df_max = df.reset_index(drop=True).groupby(['date', 'region_wb']).agg(['max'])[column].groupby(
-        'region_wb').max()
-    current_reg_df_sum = df.loc[df.index == df.index.max(), :].groupby('region_wb').agg(['sum'])[column].round(0)
-    yd_reg_df_sum = df.loc[df.index == df.index.max() - timedelta(days=1), :].groupby('region_wb').agg(['sum'])[
-        column].round(0)
+    if '_per_100k' in column:
+        # Recalculate Values per Population per Region for accuracy
+        # Get original column
+        column_original = column.replace('_per_100k', '')
+        # Sum population per region
+        reg_df_sum_population = df.groupby('region_wb').agg(['sum'])['population_100k']
+        reg_df_sum_population.columns = ['population']
 
-    for i, region in enumerate(reg_df_sum_total.index.unique()):
+        # Aggregate maximum value for the dates and regions
+        reg_df_max = df.reset_index(drop=True).groupby(['date', 'region_wb']).agg(['sum'])[column_original].groupby('region_wb').agg(['max'])
+        reg_df_max.columns = ['max']
+        # Aggregate most recent day's value for regions
+        current_reg_df_sum = df.loc[df.index == df.index.max(), :].groupby('region_wb').agg(['sum'])[column_original]
+        # Aggregate yesterday's value for regions
+        yd_reg_df_sum = df.loc[df.index == df.index.max() - timedelta(days=1), :].groupby('region_wb').agg(['sum'])[column_original]
 
-        max_value = reg_df_max.reset_index().loc[reg_df_max.index == region, 'max'].values[0]
-        current_value = current_reg_df_sum.reset_index().loc[current_reg_df_sum.index == region, 'sum'].values[0]
-        yd_value = yd_reg_df_sum.reset_index().loc[yd_reg_df_sum.index == region, 'sum'].values[0]
+        # Join population
+        reg_df_max = reg_df_max.join(reg_df_sum_population)
+        current_reg_df_sum = current_reg_df_sum.join(reg_df_sum_population)
+        yd_reg_df_sum = yd_reg_df_sum.join(reg_df_sum_population)
+
+        # Normalise values for population
+        reg_df_max['max'] = reg_df_max['max'] / reg_df_max['population']
+        current_reg_df_sum['sum'] = current_reg_df_sum['sum'] / current_reg_df_sum['population']
+        yd_reg_df_sum['sum'] = yd_reg_df_sum['sum'] / yd_reg_df_sum['population']
+    else:
+        # Aggregate maximum value for the dates and regions
+        reg_df_max = df.reset_index(drop=True).groupby(['date', 'region_wb']).agg(['max'])[column].groupby('region_wb').max()
+        # Aggregate most recent day's value for regions
+        current_reg_df_sum = df.loc[df.index == df.index.max(), :].groupby('region_wb').agg(['sum'])[column]
+        # Aggregate yesterday's value for regions
+        yd_reg_df_sum = df.loc[df.index == df.index.max() - timedelta(days=1), :].groupby('region_wb').agg(['sum'])[column]
+
+    # Sort values to sort charts below
+    current_reg_df_sum = current_reg_df_sum.sort_values(by='sum', ascending=False)
+
+    for i, region in enumerate(current_reg_df_sum.index.unique()):
+
+        max_value = reg_df_max.reset_index().loc[reg_df_max.index == region, 'max'].round(3).values[0]
+        current_value = current_reg_df_sum.reset_index().loc[current_reg_df_sum.index == region, 'sum'].round(3).values[0]
+        yd_value = yd_reg_df_sum.reset_index().loc[yd_reg_df_sum.index == region, 'sum'].round(3).values[0]
 
         if i+1 <= 2:
             position = [1, i + 1]
