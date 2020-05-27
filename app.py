@@ -306,7 +306,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     options=[{'label': l, 'value': v} for l, v in
                                              zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                                    value="confirmed_active_cases_per_100k",
+                                    value="confirmed_change_per_100k",
                                     id="chart-dropdown",
                                 ),
                                 dcc.Tabs(id='tabs-example',
@@ -346,7 +346,7 @@ app.layout = html.Div(
                                             id="chart-dropdown-2",
                                             options=[{'label': l, 'value': v} for l, v in
                                                      zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                                            value="dead_change_per_100k",
+                                            value="confirmed_per_100k",
 
                                         ), ]),
                                 # html.Div(html.P(
