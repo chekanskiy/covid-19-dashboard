@@ -767,9 +767,9 @@ def update_left_chart_2_title(selected_column, n_clicks):
 #     return ctx_msg
 
 # app.scripts.config.serve_locally = False
-app.scripts.append_script({
-    'external_url': 'https://dashboard-covid-19-dash.herokuapp.com/assets/ga.js'
-})
+# app.scripts.append_script({
+#     'external_url': 'https://dashboard-covid-19-dash.herokuapp.com/assets/ga.js'
+# })
 
 
 if __name__ == '__main__':
