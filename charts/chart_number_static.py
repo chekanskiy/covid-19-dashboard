@@ -23,10 +23,10 @@ def plot_numbers(df, value_column, aggregate_by_column='region_wb'):
     plots = [{"type": 'indicator'} for i in range(LAYOUT_MAX_CHARTS)]
     fig = make_subplots(rows=1, cols=9,
                         specs=[plots[0:]],
-                        #                         vertical_spacing=0.15,
+                        # vertical_spacing=0.15,
                         # horizontal_spacing=0.1,
-                        #                         column_widths=[2, 0.5, 0.5, 0.85, 0.5, 0.5, 0.5, 0.5, 0.5],
-                        #                         row_heights=[0.1],
+                        # column_widths=[2, 0.5, 0.5, 0.85, 0.5, 0.5, 0.5, 0.5, 0.5],
+                        # row_heights=[0.1],
                         )
 
     # Aggregate most recent day's value for regions
