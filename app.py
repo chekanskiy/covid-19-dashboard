@@ -56,14 +56,12 @@ app.index_string = '''
         {%css%}
     </head>
     <body>
-        <div>My Custom header</div>
         {%app_entry%}
         <footer>
             {%config%}
             {%scripts%}
             {%renderer%}
         </footer>
-        <div>My Custom footer</div>
     </body>
 </html>
 '''
