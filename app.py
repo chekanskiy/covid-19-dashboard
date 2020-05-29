@@ -19,6 +19,7 @@ from charts.chart_line_static import plot_lines_plotly
 from charts.chart_sunburst_static import plot_sunburst_static
 from charts.chart_bar_static import plot_bar_static
 from charts.chart_gauge_static import plot_gauges
+from charts.chart_number_static import plot_numbers
 
 # ============================================ LOAD DATA =====================================================
 df_jh_world = pd.read_csv('data/data_jhu_world.csv').round(2)
@@ -208,6 +209,9 @@ app.layout = html.Div(
                 'display': 'inline-block',
             }
         ),
+        html.Div(children=[
+            dcc.Graph(figure=plot_numbers(df_jh_world, 'confirmed', aggregate_by_column='region_wb'))
+        ]),
         html.Div(
             id="app-container",
             children=[
