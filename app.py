@@ -168,6 +168,7 @@ TAB_SELECTED_STYLE = {
     'padding': '2rem 0 0 0',
 }
 
+
 # ========================================= DEFINE LAYOUT ================================================
 app.layout = html.Div(
     id="root",
@@ -765,6 +766,12 @@ def update_left_chart_2_title(selected_column, n_clicks):
 #     }, indent=2)
 #     return ctx_msg
 
+# app.scripts.config.serve_locally = False
+app.scripts.append_script({
+    'external_url': 'https://dashboard-covid-19-dash.herokuapp.com/assets/ga.js'
+})
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
