@@ -12,7 +12,7 @@ from dash.exceptions import PreventUpdate
 
 # APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 # sys.path.insert(0, APP_PATH)
-
+from redisConnection import RedisConnection
 from charts.chart_choropleth import plot_map_go
 from charts.chart_boxplot_static import plot_box_plotly_static
 from charts.chart_line_static import plot_lines_plotly
@@ -21,15 +21,31 @@ from charts.chart_bar_static import plot_bar_static
 from charts.chart_gauge_static import plot_gauges
 from charts.chart_number_static import plot_numbers
 
+import argparse
+parser = argparse.ArgumentParser(description="")
+parser.add_argument("--source", default='local', help="local / redis")
+
+args = parser.parse_args()
+source = args.source
 # ============================================ LOAD DATA =====================================================
-df_jh_world = pd.read_csv('data/data_jhu_world.csv').round(2)
+if source == 'local':
+    df_jh_world = pd.read_csv('data/data_jhu_world.csv')
+    df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
+    json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
+elif source == 'redis':
+    redis_cur = RedisConnection()
+    df_jh_world = redis_cur.get_cached_df('df_jh_world')
+    df_rki_orig = redis_cur.get_cached_df('df_rki_orig')
+    json_geo_de = redis_cur.get_cached_json('json_geo_de')
+else:
+    raise Exception('Source is not supported')
+
 df_jh_world['date'] = df_jh_world['date'].astype('datetime64[ns]')
 df_jh_world.index = df_jh_world.date
 df_jh_world.rename_axis('date_index', axis=1, inplace=True)
-df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv').round(2)
+
 df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
 
-json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
 # ========================================= END LOAD DATA ====================================================
 
 # ========================================= CREATE APP =======================================================
