@@ -2,4 +2,6 @@
 /other
 .idea/
 .DS_Store
+.ipynb_checkpoints
 *.pyc
+*.ipynb
