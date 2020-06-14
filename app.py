@@ -21,24 +21,28 @@ from charts.chart_bar_static import plot_bar_static
 from charts.chart_gauge_static import plot_gauges
 from charts.chart_number_static import plot_numbers
 
-import argparse
-parser = argparse.ArgumentParser(description="")
-parser.add_argument("--source", default='local', help="local / redis")
+# import argparse
+# parser = argparse.ArgumentParser(description="")
+# parser.add_argument("--source", default='local', help="local / redis")
+#
+# args = parser.parse_args()
+# source = args.source
+# # ============================================ LOAD DATA =====================================================
+# if source == 'local':
+#     df_jh_world = pd.read_csv('data/data_jhu_world.csv')
+#     df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
+#     json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
+# elif source == 'redis':
+#     redis_cur = RedisConnection()
+#     df_jh_world = redis_cur.get_cached_df('df_jh_world')
+#     df_rki_orig = redis_cur.get_cached_df('df_rki_orig')
+#     json_geo_de = redis_cur.get_cached_json('json_geo_de')
+# else:
+#     raise Exception('Source is not supported')
 
-args = parser.parse_args()
-source = args.source
-# ============================================ LOAD DATA =====================================================
-if source == 'local':
-    df_jh_world = pd.read_csv('data/data_jhu_world.csv')
-    df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
-    json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
-elif source == 'redis':
-    redis_cur = RedisConnection()
-    df_jh_world = redis_cur.get_cached_df('df_jh_world')
-    df_rki_orig = redis_cur.get_cached_df('df_rki_orig')
-    json_geo_de = redis_cur.get_cached_json('json_geo_de')
-else:
-    raise Exception('Source is not supported')
+df_jh_world = pd.read_csv('data/data_jhu_world.csv')
+df_rki_orig = pd.read_csv('data/data_rki_apple_prepared_dash.csv')
+json_geo_de = json.load(open('data/data_geo_de.json', 'r'))
 
 df_jh_world['date'] = df_jh_world['date'].astype('datetime64[ns]')
 df_jh_world.index = df_jh_world.date
