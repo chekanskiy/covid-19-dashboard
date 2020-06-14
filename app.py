@@ -53,6 +53,7 @@ df_rki_orig['date'] = df_rki_orig['date'].astype('datetime64[ns]')
 app = dash.Dash(__name__,
                 meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1.0"}], )
 # external_stylesheets=external_stylesheets)
+server2 = app.server
 
 app.index_string = '''
 <!DOCTYPE html>
@@ -818,6 +819,5 @@ def update_left_chart_2_title(selected_column, n_clicks):
 
 
 if __name__ == '__main__':
-    server = app.server
     app.run_server(debug=True)
 
