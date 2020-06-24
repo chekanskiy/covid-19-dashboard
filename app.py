@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+from datetime import datetime
 
 import dash
 import dash_core_components as dcc
@@ -219,7 +220,6 @@ TAB_SELECTED_STYLE = {
 }
 
 
-# ========================================= DEFINE LAYOUT ================================================
 app.layout = html.Div(
     id="root",
     # style={'backgroundColor': colors['background']},
@@ -257,6 +257,19 @@ app.layout = html.Div(
         ],
             style={
                 'width': '15%',
+                'display': 'inline-block',
+            }
+        ),
+        html.Div(children=[
+            dcc.DatePickerRange(id="main-dates-selector",
+                                min_date_allowed=max(df_jh_world.date.min(), df_rki_orig.date.min()),
+                                max_date_allowed=max(df_jh_world.date.max(), df_rki_orig.date.max()),
+                                start_date=max(df_jh_world.date.min(), df_rki_orig.date.min()),
+                                end_date=min(df_jh_world.date.max(), df_rki_orig.date.max()),
+            ),
+        ],
+            style={
+                'width': '30%',
                 'display': 'inline-block',
             }
         ),
@@ -419,6 +432,7 @@ app.layout = html.Div(
             ]
         )
     ])
+# ========================================= DEFINE LAYOUT ================================================
 
 
 @app.callback(
@@ -524,9 +538,11 @@ def moving_average_7d(df, selected_column, selected_states):
     [Input('chart-dropdown', 'value'),
      Input('dropdown-states', 'value'),
      Input('main-data-selector', 'value'),
-     Input("button-weekly-top", "n_clicks")
+     Input("button-weekly-top", "n_clicks"),
+     Input('main-dates-selector', 'start_date'),
+     Input('main-dates-selector', 'end_date'),
      ])
-def update_left_chart(selected_column, selected_states, world_vs_germany, n_clicks):
+def update_left_chart(selected_column, selected_states, world_vs_germany, n_clicks, start_date, end_date):
     """
     Displays / Updates the left chart.
     Number of clicks on the button-weekly-top object define how the data is filtered
@@ -535,10 +551,11 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
     :param n_clicks:
     :return:
     """
+
     if world_vs_germany == 'GER':
-        df = df_rki_orig
+        df = df_rki_orig[(df_rki_orig.date >= start_date) & (df_rki_orig.date <= end_date)]
     else:
-        df = df_jh_world
+        df = df_jh_world[(df_jh_world.date >= start_date) & (df_jh_world.date <= end_date)]
 
     ctx = dash.callback_context
     if ctx.triggered:
@@ -573,9 +590,11 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
     [Input('dropdown-states', 'value'),
      Input('chart-dropdown-2', 'value'),
      Input('main-data-selector', 'value'),
-     Input("button-weekly-2", "n_clicks")
+     Input("button-weekly-2", "n_clicks"),
+     Input('main-dates-selector', 'start_date'),
+     Input('main-dates-selector', 'end_date'),
      ])
-def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_clicks):
+def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_clicks, start_date, end_date):
     """
     Displays / Updates the left chart.
     Number of clicks on the button-weekly-2 object define how the data is filtered
@@ -587,9 +606,9 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
     """
 
     if world_vs_germany == 'GER':
-        df = df_rki_orig
+        df = df_rki_orig[(df_rki_orig.date >= start_date) & (df_rki_orig.date <= end_date)]
     else:
-        df = df_jh_world
+        df = df_jh_world[(df_jh_world.date >= start_date) & (df_jh_world.date <= end_date)]
 
     ctx = dash.callback_context
     if ctx.triggered:
