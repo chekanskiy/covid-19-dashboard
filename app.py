@@ -262,10 +262,10 @@ app.layout = html.Div(
         ),
         html.Div(children=[
             dcc.DatePickerRange(id="main-dates-selector",
-                                min_date_allowed=max(df_jh_world.date.min(), df_rki_orig.date.min()),
+                                min_date_allowed=min(df_jh_world.date.min(), df_rki_orig.date.min()),
                                 max_date_allowed=max(df_jh_world.date.max(), df_rki_orig.date.max()),
-                                start_date=max(df_jh_world.date.min(), df_rki_orig.date.min()),
-                                end_date=min(df_jh_world.date.max(), df_rki_orig.date.max()),
+                                start_date=min(df_jh_world.date.min(), df_rki_orig.date.min()),
+                                end_date=max(df_jh_world.date.max(), df_rki_orig.date.max()),
             ),
         ],
             style={
