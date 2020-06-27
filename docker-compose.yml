@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+    app:
+        image: schekan/covid-dashboard-app:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "8050:8050"
+            - "5000:5000"
+        command: app.py
