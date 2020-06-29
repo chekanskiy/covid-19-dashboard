@@ -17,6 +17,7 @@ from redisConnection import RedisConnection
 from charts.chart_choropleth import plot_map_go
 from charts.chart_boxplot_static import plot_box_plotly_static
 from charts.chart_line_static import plot_lines_plotly
+from charts.chart_line_stacked_static import plot_lines_stacked_plotly
 from charts.chart_sunburst_static import plot_sunburst_static
 from charts.chart_bar_static import plot_bar_static
 from charts.chart_gauge_static import plot_gauges
@@ -375,7 +376,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     options=[{'label': l, 'value': v} for l, v in
                                              zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                                    value="confirmed_change_per_100k",
+                                    value="confirmed_change_sum7d_per_100k",
                                     id="chart-dropdown",
                                 ),
                                 dcc.Tabs(id='tabs-example',
@@ -415,7 +416,7 @@ app.layout = html.Div(
                                             id="chart-dropdown-2",
                                             options=[{'label': l, 'value': v} for l, v in
                                                      zip(FEATURE_DROP_DOWN.values(), FEATURE_DROP_DOWN.keys())],
-                                            value="confirmed_per_100k",
+                                            value="confirmed_change",
 
                                         ), ]),
                                 # html.Div(html.P(
@@ -518,7 +519,7 @@ def update_weekly_button_2(n_clicks):
     return weekly_button_logic(n_clicks)['name']
 
 
-def moving_average_7d(df, selected_column, selected_states):
+def moving_average_7d(df, selected_column):
     """
     Adds a column to the df with the 7days moving average of the selected column for
     each 'land' individually
@@ -526,7 +527,8 @@ def moving_average_7d(df, selected_column, selected_states):
     :param selected_column:
     :return:
     """
-    df = df.loc[df.land.isin(selected_states)].reset_index(drop=True)
+    # df = df.loc[df.land.isin(selected_states)].reset_index(drop=True)
+    df = df.reset_index(drop=True)
     ro = df.groupby('land').rolling(7, on='date').mean().reset_index(drop=False).loc[:,
          ['date', 'land', selected_column]].round(2)
     df = df.merge(ro, on=['date', 'land'], suffixes=('', '_weekly'))
@@ -575,7 +577,7 @@ def update_left_chart(selected_column, selected_states, world_vs_germany, n_clic
         df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
-            df, selected_column = moving_average_7d(df, selected_column, selected_states)
+            df, selected_column = moving_average_7d(df, selected_column)
 
         df.set_index('date', inplace=True, drop=False)
         df = df.dropna(how='all', subset=[selected_column])
@@ -609,8 +611,9 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
     if world_vs_germany == 'GER':
         df = df_rki_orig[(df_rki_orig.date >= start_date) & (df_rki_orig.date <= end_date)]
     else:
-        df = df_jh_world[(df_jh_world.date >= start_date) & (df_jh_world.date <= end_date)]
-
+        df = df_jh_world.loc[(df_jh_world.date >= start_date) & (df_jh_world.date <= end_date),
+                             ['region_wb', selected_column]].groupby(by=['region_wb', 'date']).sum()\
+            .reset_index().set_index('date', drop=False).rename({'region_wb': 'land'}, axis=1)
     ctx = dash.callback_context
     if ctx.triggered:
         if ctx.triggered[0]['prop_id'] == 'main-data-selector.value':
@@ -621,17 +624,24 @@ def update_left_chart_2(selected_states, selected_column, world_vs_germany, n_cl
 
     if len(selected_states) > 0 and not (world_vs_germany == 'WRLD'
                                          and selected_column in ['driving', 'walking', 'transit']):
-        df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
+        if world_vs_germany == 'GER':
+            df = df.loc[df.land.isin(selected_states), ['land', selected_column, 'date', 'confirmed_peak_date']]
 
         if weekly_button_logic(n_clicks)['action'] == 1:  # Button is clicked uneven number of times.
-            df, selected_column = moving_average_7d(df, selected_column, selected_states)
+            df, selected_column = moving_average_7d(df, selected_column)
 
         df.set_index('date', inplace=True, drop=False)
         df = df.dropna(how='all', subset=[selected_column])
 
-        figure = plot_lines_plotly(df, selected_column,
-                                   show_doubling=False, doubling_days=7, showlegend=False,
-                                   _colors=COLORS['charts'])
+        if world_vs_germany == 'GER':
+            figure = plot_lines_plotly(df, selected_column,
+                                       show_doubling=False, doubling_days=7, showlegend=False,
+                                       _colors=COLORS['charts'])
+        else:
+            figure = plot_lines_stacked_plotly(df, selected_column,
+                                               showlegend=True,
+                                               # _colors=COLORS['charts']
+                                               )
 
     else:  # Default figure is displayed initially, on refresh and when no states are selected
         figure = BASE_FIGURE
